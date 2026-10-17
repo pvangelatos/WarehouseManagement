@@ -1,5 +1,5 @@
 
-namespace Api
+namespace WarehouseManagement.Api
 {
     public class Program
     {

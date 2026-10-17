@@ -1,11 +1,11 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/Api/Api.csproj" />
-    <Project Path="src/Application/Application.csproj" />
-    <Project Path="src/Domain/Domain.csproj" />
-    <Project Path="src/Infrastructure/Infrastructure.csproj" />
+    <Project Path="src/WarehouseManagement.Api/WarehouseManagement.Api.csproj" Id="4d1d45e7-5e6d-4227-9b48-e4356d04d1d3" />
+    <Project Path="src/WarehouseManagement.Application/WarehouseManagement.Application.csproj" Id="47eed0b2-ec15-4a72-87e9-9b6cec680cb9" />
+    <Project Path="src/WarehouseManagement.Domain/WarehouseManagement.Domain.csproj" Id="3ae588ef-fc9d-493b-872d-afa8aaa64a5f" />
+    <Project Path="src/WarehouseManagement.Infrastructure/WarehouseManagement.Infrastructure.csproj" Id="71409bf0-a87b-466a-b257-a76567b1cafb" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/Domain.UnitTests/Domain.UnitTests.csproj" />
+    <Project Path="tests/WarehouseManagement.Domain.UnitTests/WarehouseManagement.Domain.UnitTests.csproj" Id="73e20287-02b1-42a5-a19d-eb841d49b403" />
   </Folder>
 </Solution>
