@@ -5,8 +5,8 @@
 
 ## Ολοκληρωμένα tasks
 - [x] 1.1 Δημιουργία repo, .gitignore
-- [ ] 1.1 README / PROGRESS (σε εξέλιξη)
-- [ ] 1.2 Solution structure (src/ & tests/, project references)
+- [x] 1.1 README / PROGRESS
+- [x] 1.2 Solution structure (src/ & tests/, project references)
 - [ ] 1.3 Directory.Build.props, .editorconfig, global.json
 - [ ] 1.4 docs/domain.md (Ubiquitous Language, business rules)
 

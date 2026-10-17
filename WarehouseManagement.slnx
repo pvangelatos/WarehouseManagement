@@ -1,4 +1,11 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="DIrectory.Build.props" />
+    <File Path="global.json" />
+    <File Path="PROGRESS.md" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/WarehouseManagement.Api/WarehouseManagement.Api.csproj" Id="4d1d45e7-5e6d-4227-9b48-e4356d04d1d3" />
     <Project Path="src/WarehouseManagement.Application/WarehouseManagement.Application.csproj" Id="47eed0b2-ec15-4a72-87e9-9b6cec680cb9" />
