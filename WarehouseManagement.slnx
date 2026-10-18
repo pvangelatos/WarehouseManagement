@@ -3,6 +3,7 @@
     <File Path=".editorconfig" />
     <File Path=".gitignore" />
     <File Path="DIrectory.Build.props" />
+    <File Path="docs/domain.md" />
     <File Path="global.json" />
     <File Path="PROGRESS.md" />
   </Folder>
