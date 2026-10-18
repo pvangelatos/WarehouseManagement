@@ -1,7 +1,6 @@
-﻿
-namespace WarehouseManagement.Domain.Exceptions;
+﻿namespace WarehouseManagement.Domain.Exceptions;
 
-public sealed class BusinessRuleException : Exception
+public class BusinessRuleException : Exception
 {
     public BusinessRuleException(string message) : base(message)
     {
