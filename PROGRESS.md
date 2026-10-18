@@ -25,6 +25,7 @@
 | Business rules | Τεκμηριωμένα στο `docs/domain.md` με σταθερούς κωδικούς BR-xx | Τα tests θα αναφέρονται στους κωδικούς, γι' αυτό δεν γίνεται επαναρίθμηση |
 | Διόρθωση λαθών κίνησης | Μόνο με Reversal, ποτέ με Adjustment (BR-15a) | Ένας τρόπος διόρθωσης, καθαρό audit trail |
 | Έγκριση Adjustment | Μόνο οι μειώσεις άνω του 20% απαιτούν έγκριση (BR-14) | Ο κίνδυνος είναι κυρίως η απόκρυψη απωλειών |
+| Merge strategy | Squash merge only, ruleset protect-main (PR υποχρεωτικό, χωρίς force push) | Καθαρό ιστορικό στο main, ένα commit ανά task |
 
 ## Επόμενο βήμα
 Task 2.1 — Πρώτα value objects (SKU, Quantity) με unit tests
