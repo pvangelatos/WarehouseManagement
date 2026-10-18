@@ -10,6 +10,7 @@
 - [x] 1.3 Directory.Build.props, .editorconfig, global.json
 - [x] 1.4 docs/domain.md (Ubiquitous Language, business rules)
 - [x] Ερωτήσεις συνέντευξης Φάσης 1
+- [x] 2.1 Value object SKU + BusinessRuleException + unit tests (BR-20)
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -25,6 +26,11 @@
 | Business rules | Τεκμηριωμένα στο `docs/domain.md` με σταθερούς κωδικούς BR-xx | Τα tests θα αναφέρονται στους κωδικούς, γι' αυτό δεν γίνεται επαναρίθμηση |
 | Διόρθωση λαθών κίνησης | Μόνο με Reversal, ποτέ με Adjustment (BR-15a) | Ένας τρόπος διόρθωσης, καθαρό audit trail |
 | Έγκριση Adjustment | Μόνο οι μειώσεις άνω του 20% απαιτούν έγκριση (BR-14) | Ο κίνδυνος είναι κυρίως η απόκρυψη απωλειών |
+| Merge strategy | Squash merge only, ruleset protect-main (PR υποχρεωτικό, χωρίς force push) | Καθαρό ιστορικό στο main, ένα commit ανά task |
+| Domain errors | Throw `BusinessRuleException` στο Domain, Result pattern στο Application (Φάση 3) | Το Domain είναι η τελευταία γραμμή άμυνας, το Application κάνει validation πριν φτάσει εκεί |
+| Branch naming | `feature/<task-id>-<περιγραφή>` (π.χ. `feature/2.1-sku`) | Το branch δείχνει αμέσως σε ποιο task ανήκει |
+| Οργάνωση Domain | Φάκελοι ανά έννοια του domain (`Items/`, `Exceptions/`) και όχι ανά τεχνικό τύπο | Ό,τι αφορά μια έννοια βρίσκεται μαζί, ακολουθεί το Ubiquitous Language |
+| Μορφή SKU | Μόνο λατινικοί χαρακτήρες A-Z, ψηφία και παύλα (BR-20) | Αποφυγή διπλών υλικών από ελληνικούς/κυριλλικούς χαρακτήρες που μοιάζουν ίδιοι |
 
 ## Επόμενο βήμα
-Task 2.1 — Πρώτα value objects (SKU, Quantity) με unit tests
+Task 2.2 — Value object `Quantity` (αποφάσεις για decimal, μηδενικές ποσότητες, Unit of Measure)
