@@ -1,7 +1,7 @@
 # Progress
 
 ## Τρέχουσα φάση
-**Φάση 1 — Θεμέλια** (solution structure, Git, σύγχρονη C#, domain modeling)
+**Φάση 2 — Domain layer (entities, value objects, aggregates, invariants, xUnit tests)
 
 ## Ολοκληρωμένα tasks
 - [x] 1.1 Δημιουργία repo, .gitignore
@@ -9,6 +9,7 @@
 - [x] 1.2 Solution structure (src/ & tests/, project references)
 - [x] 1.3 Directory.Build.props, .editorconfig, global.json
 - [x] 1.4 docs/domain.md (Ubiquitous Language, business rules)
+- [x] Ερωτήσεις συνέντευξης Φάσης 1
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -26,4 +27,4 @@
 | Έγκριση Adjustment | Μόνο οι μειώσεις άνω του 20% απαιτούν έγκριση (BR-14) | Ο κίνδυνος είναι κυρίως η απόκρυψη απωλειών |
 
 ## Επόμενο βήμα
-Ερωτήσεις συνέντευξης Φάσης 1 → έναρξη Φάσης 2 (Domain layer)
+Task 2.1 — Πρώτα value objects (SKU, Quantity) με unit tests
