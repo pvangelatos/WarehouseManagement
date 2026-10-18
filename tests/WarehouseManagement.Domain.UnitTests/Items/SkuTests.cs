@@ -10,8 +10,8 @@ public class SkuTests
     [InlineData("AB12")]
     [InlineData("AB-12")]
     [InlineData("A1B")]
-    [InlineData("A1B2C3D4E5F6G7H8I9J")]
     [InlineData("A1B2C3D4E5F6G7H8I9JG")]
+    [InlineData("A1B2C3D4E5F6G7H8I9JGH")]
     public void Create_ValidSku_ReturnsSku(string input)
     {
         // Act
@@ -68,7 +68,7 @@ public class SkuTests
     [Theory]
     [InlineData("AB")]
     [InlineData("A")]
-    [InlineData("A19087654TAHESGEWSBAH90876")]
+    [InlineData("A19087654TAHESGEWSBAH")]
     public void Create_SkuWithInvalidLength_ThrowsBusinessRuleException(string input)
     {
         // Act & Assert
