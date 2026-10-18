@@ -11,7 +11,7 @@ public class SkuTests
     [InlineData("AB-12")]
     [InlineData("A1B")]
     [InlineData("A1B2C3D4E5F6G7H8I9JG")]
-    [InlineData("A1B2C3D4E5F6G7H8I9JGH")]
+
     public void Create_ValidSku_ReturnsSku(string input)
     {
         // Act

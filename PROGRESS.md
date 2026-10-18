@@ -10,7 +10,7 @@
 - [x] 1.3 Directory.Build.props, .editorconfig, global.json
 - [x] 1.4 docs/domain.md (Ubiquitous Language, business rules)
 - [x] Ερωτήσεις συνέντευξης Φάσης 1
-- [x] 2.1 Value object SKU + BusinesRuleException + unit tests (BR-20)
+- [x] 2.1 Value object SKU + BusinessRuleException + unit tests (BR-20)
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
