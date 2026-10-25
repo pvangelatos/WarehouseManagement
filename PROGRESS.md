@@ -11,6 +11,7 @@
 - [x] 1.4 docs/domain.md (Ubiquitous Language, business rules)
 - [x] Ερωτήσεις συνέντευξης Φάσης 1
 - [x] 2.1 Value object SKU + BusinessRuleException + unit tests (BR-20)
+- [x] 2.2a docs/domain.md: ποσότητες και μονάδες μέτρησης (BR-21 έως BR-25)
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -36,4 +37,4 @@
 | Unit of Measure | Smart enum value object, ανήκει στο `Item` και όχι στο `Quantity` | Κλειστή λίστα χωρίς παραλλαγές γραφής, κάθε μονάδα ξέρει αν επιτρέπει δεκαδικά. Όλες οι ποσότητες στη βασική μονάδα του υλικού, οπότε δεν προστίθενται κιλά με τεμάχια |
 
 ## Επόμενο βήμα
-Task 2.2 — Quantity & UnitOfMeasure (2.2a domain.md → 2.2b UnitOfMeasure → 2.2c Quantity)
+Task 2.2b UnitOfMeasure → 2.2c Quantity
