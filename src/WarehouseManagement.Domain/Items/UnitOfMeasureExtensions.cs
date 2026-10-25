@@ -17,7 +17,7 @@ public static class UnitOfMeasureExtensions
         };
     }
 
-    public static string UnEneCode(this UnitOfMeasure unitOfMeasure)
+    public static string UnEceCode(this UnitOfMeasure unitOfMeasure)
     {
         return unitOfMeasure switch
         {
