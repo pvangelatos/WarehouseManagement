@@ -14,6 +14,8 @@
 - [x] 2.2a docs/domain.md: ποσότητες και μονάδες μέτρησης (BR-21 έως BR-25)
 - [x] 2.2b Enum UnitOfMeasure με extensions (AllowedDecimals, UnEceCode) + tests (BR-24)
 - [x] 2.2c Value object Quantity (validation BR-21..23, operators, Zero) + tests 
+- [x] 2.3a docs/domain.md: κύκλος ζωής Item, BR-26..30
+- [x] 2.3b Entity Item
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -47,4 +49,4 @@
 | Όνομα υλικού | `string` με έλεγχο μέσα στο `Item` (όχι value object) | Χρησιμοποιείται μόνο από το `Item`, χωρίς πράξεις· YAGNI |
 
 ## Επόμενο βήμα
-Task 2.3a — BR-26..30 στο domain.md (αποφάσεις κλειδωμένες, μένει η διατύπωση) → 2.3b Entity Item
+Task 2.3c — Κύκλος ζωής Item: Discontinue, Deactivate, ChangeReorderPoint (BR-27..30). 2.3a/2.3b ολοκληρώθηκαν στο branch feature/2.3-item
