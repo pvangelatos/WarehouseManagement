@@ -40,6 +40,10 @@
 | Έλεγχος δεκαδικών | `decimal.Round(value, n) != value` και όχι `decimal.Scale` | Το `Scale` μετρά και τα trailing zeros (1.2300 = 4), άρα θα απέρριπτε έγκυρες τιμές |
 | Operators του Quantity | Χωρίς μονάδα, μέσω private constructor | Άθροισμα/διαφορά έγκυρων ποσοτήτων δεν αυξάνει τα δεκαδικά. Η συμβατότητα μονάδων εξασφαλίζεται από το `Item` (BR-25) |
 | Test data με decimal | `TheoryData` + `[MemberData]` | Τα attributes δεν δέχονται `decimal`, και το `double` χάνει τα trailing zeros |
+| Ταυτότητα Item | Surrogate key (`Guid`, v7) + SKU ως μοναδικός business identifier | Το Id δεν εξαρτάται από business δεδομένα· οι χρήστες ψάχνουν με SKU, το σύστημα συνδέει με Id |
+| Entities | `class`, όχι `record` | Ισότητα κατά ταυτότητα· το `with` θα δημιουργούσε αντίγραφα της ίδιας entity |
+| Κύκλος ζωής Item | Active → Discontinued → Inactive, μόνο προς τα εμπρός | Αντικατοπτρίζει την πραγματική απόσυρση υλικού: πρώτα εξάντληση υπολοίπου, μετά κλείσιμο |
+| Κανόνες εκτός Item | Μοναδικότητα SKU και ιστορικό κινήσεων (BR-19) ελέγχονται στο Application layer | Το Item δεν γνωρίζει άλλα υλικά ούτε τις κινήσεις του |
 
 ## Επόμενο βήμα
-Task 2.3 — Entity Item (SKU, UnitOfMeasure, BR-19, BR-25)
+Task 2.3a — BR-26..30 στο domain.md (αποφάσεις κλειδωμένες, μένει η διατύπωση) → 2.3b Entity Item
