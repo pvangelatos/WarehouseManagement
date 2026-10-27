@@ -45,6 +45,7 @@ public class QuantityTests
     {
         // Act
         var quantity = Quantity.Create(value, unitOfMeasure);
+
         // Assert
         Assert.Equal(value, quantity.Value);
     }
@@ -69,6 +70,7 @@ public class QuantityTests
     {
         // Act
         var quantity = Quantity.Create(value, unitOfMeasure);
+
         // Assert
         Assert.Equal(value, quantity.Value);
     }
@@ -94,7 +96,151 @@ public class QuantityTests
     {
         // Act
         var quantity = Quantity.Create(value, unitOfMeasure);
+
         // Assert
         Assert.Equal(value, quantity.Value);
+    }
+
+    [Fact]
+    public void Addition_ValidQuantities_ReturnsCorrectSum()
+    {
+        // Arrange
+        var quantity1 = Quantity.Create(2.5m, UnitOfMeasure.Kilogram);
+        var quantity2 = Quantity.Create(3.0m, UnitOfMeasure.Kilogram);
+
+        // Act
+        var result = quantity1 + quantity2;
+
+        // Assert
+        Assert.Equal(5.5m, result.Value);
+    }
+
+    [Fact]
+    public void Subtraction_ValidQuantities_ReturnsCorrectDifference()
+    {
+        // Arrange
+        var quantity1 = Quantity.Create(5.0m, UnitOfMeasure.Kilogram);
+        var quantity2 = Quantity.Create(3.0m, UnitOfMeasure.Kilogram);
+
+        // Act
+        var result = quantity1 - quantity2;
+
+        // Assert
+        Assert.Equal(2.0m, result.Value);
+    }
+
+    [Fact]
+    [Trait("BR", "BR-21")]
+    public void Subtraction_EqualQuantities_ReturnsZeroQuantity()
+    {
+        // Arrange
+        var quantity1 = Quantity.Create(3.0m, UnitOfMeasure.Kilogram);
+        var quantity2 = Quantity.Create(3.0m, UnitOfMeasure.Kilogram);
+
+        // Act
+        var result = quantity1 - quantity2;
+
+        // Assert
+        Assert.Equal(0.0m, result.Value);
+    }
+
+    [Fact]
+    [Trait("BR", "BR-21")]
+    public void Subtraction_ResultingNegativeQuantity_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        var quantity1 = Quantity.Create(2.0m, UnitOfMeasure.Kilogram);
+        var quantity2 = Quantity.Create(3.0m, UnitOfMeasure.Kilogram);
+
+        // Act & Assert
+        Assert.Throws<BusinessRuleException>(() => { _ = quantity1 - quantity2; });
+    }
+
+    [Fact]
+    public void Comparison_ValidQuantities_ReturnsCorrectComparison()
+    {
+        // Arrange
+        var quantity1 = Quantity.Create(2.0m, UnitOfMeasure.Kilogram);
+        var quantity2 = Quantity.Create(3.0m, UnitOfMeasure.Kilogram);
+
+        // Act & Assert
+        Assert.True(quantity1 < quantity2);
+        Assert.True(quantity2 > quantity1);
+        Assert.True(quantity1 <= quantity2);
+        Assert.True(quantity2 >= quantity1);
+    }
+
+    [Fact]
+    public void Comparison_EqualQuantities_ReturnsCorrectComparison()
+    {
+        // Arrange
+        var quantity1 = Quantity.Create(2.0m, UnitOfMeasure.Kilogram);
+        var quantity2 = Quantity.Create(2.0m, UnitOfMeasure.Kilogram);
+
+        // Act & Assert
+        Assert.False(quantity1 < quantity2);
+        Assert.False(quantity1 > quantity2);
+        Assert.True(quantity1 <= quantity2);
+        Assert.True(quantity1 >= quantity2);
+    }
+
+    [Fact]
+    public void Addition_NullQuantity_ThrowsArgumentNullException()
+    {
+        // Arrange
+        Quantity quantity1 = null!;
+        var quantity2 = Quantity.Create(3.0m, UnitOfMeasure.Kilogram);
+
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => { _ = quantity1 + quantity2; });
+    }
+
+    [Fact]
+    public void Subtraction_NullQuantity_ThrowsArgumentNullException()
+    {
+        // Arrange
+        Quantity quantity1 = null!;
+        var quantity2 = Quantity.Create(3.0m, UnitOfMeasure.Kilogram);
+
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => { _ = quantity1 - quantity2; });
+    }
+
+    [Fact]
+    public void Comparison_NullQuantity_ThrowsArgumentNullException()
+    {
+        // Arrange
+        Quantity quantity1 = null!;
+        var quantity2 = Quantity.Create(3.0m, UnitOfMeasure.Kilogram);
+
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => { _ = quantity1 < quantity2; });
+        Assert.Throws<ArgumentNullException>(() => { _ = quantity1 > quantity2; });
+        Assert.Throws<ArgumentNullException>(() => { _ = quantity1 <= quantity2; });
+        Assert.Throws<ArgumentNullException>(() => { _ = quantity1 >= quantity2; });
+    }
+
+    [Fact]
+    public void Equality_SameValueDifferentScale_ReturnsTrue()
+    {
+        // Arrange
+        var quantity1 = Quantity.Create(2.5m, UnitOfMeasure.Kilogram);
+        var quantity2 = Quantity.Create(2.500m, UnitOfMeasure.Kilogram);
+
+        // Act & Assert
+        Assert.Equal(quantity1, quantity2);
+        Assert.True(quantity1 == quantity2);
+        Assert.False(quantity1 != quantity2);
+    }
+
+    [Fact]
+    public void Zero_ComparedToCreatedZero_IsEqual()
+    {
+        // Arrange
+        var zeroQuantity = Quantity.Zero;
+        var createdZeroQuantity = Quantity.Create(0, UnitOfMeasure.Kilogram);
+
+        // Act & Assert
+        Assert.Equal(zeroQuantity, createdZeroQuantity);
     }
 }
