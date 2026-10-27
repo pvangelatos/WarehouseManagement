@@ -12,6 +12,8 @@
 - [x] Ερωτήσεις συνέντευξης Φάσης 1
 - [x] 2.1 Value object SKU + BusinessRuleException + unit tests (BR-20)
 - [x] 2.2a docs/domain.md: ποσότητες και μονάδες μέτρησης (BR-21 έως BR-25)
+- [x] 2.2b Enum UnitOfMeasure με extensions (AllowedDecimals, UnEceCode) + tests (BR-24)
+- [x] 2.2c Value object Quantity (validation BR-21..23, operators, Zero) + tests 
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -35,6 +37,9 @@
 | Τύπος ποσότητας | `decimal`, μέχρι 3 δεκαδικά | Ακρίβεια χωρίς σφάλματα floating point, 3 δεκαδικά καλύπτουν γραμμάρια/χιλιοστόλιτρα/χιλιοστά |
 | Μηδενική ποσότητα | Ένας τύπος `Quantity` (≥ 0), το «> 0» ελέγχεται στην κίνηση | Ένα μόνο σημείο χρειάζεται «> 0» (YAGNI). Refactor σε `PositiveQuantity` αν εμφανιστεί δεύτερο |
 | Unit of Measure | Smart enum value object, ανήκει στο `Item` και όχι στο `Quantity` | Κλειστή λίστα χωρίς παραλλαγές γραφής, κάθε μονάδα ξέρει αν επιτρέπει δεκαδικά. Όλες οι ποσότητες στη βασική μονάδα του υλικού, οπότε δεν προστίθενται κιλά με τεμάχια |
+| Έλεγχος δεκαδικών | `decimal.Round(value, n) != value` και όχι `decimal.Scale` | Το `Scale` μετρά και τα trailing zeros (1.2300 = 4), άρα θα απέρριπτε έγκυρες τιμές |
+| Operators του Quantity | Χωρίς μονάδα, μέσω private constructor | Άθροισμα/διαφορά έγκυρων ποσοτήτων δεν αυξάνει τα δεκαδικά. Η συμβατότητα μονάδων εξασφαλίζεται από το `Item` (BR-25) |
+| Test data με decimal | `TheoryData` + `[MemberData]` | Τα attributes δεν δέχονται `decimal`, και το `double` χάνει τα trailing zeros |
 
 ## Επόμενο βήμα
-Task 2.2b UnitOfMeasure → 2.2c Quantity
+Task 2.3 — Entity Item (SKU, UnitOfMeasure, BR-19, BR-25)
