@@ -16,6 +16,7 @@
 - [x] 2.2c Value object Quantity (validation BR-21..23, operators, Zero) + tests 
 - [x] 2.3a docs/domain.md: κύκλος ζωής Item, BR-26..30
 - [x] 2.3b Entity Item
+- [x] 2.3c-1 Item.Discontinue (BR-27) + tests 
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -49,4 +50,4 @@
 | Όνομα υλικού | `string` με έλεγχο μέσα στο `Item` (όχι value object) | Χρησιμοποιείται μόνο από το `Item`, χωρίς πράξεις· YAGNI |
 
 ## Επόμενο βήμα
-Task 2.3c — Κύκλος ζωής Item: Discontinue, Deactivate, ChangeReorderPoint (BR-27..30). 2.3a/2.3b ολοκληρώθηκαν στο branch feature/2.3-item
+Task 2.3c-2 — Item.ChangeReorderPoint (BR-30)

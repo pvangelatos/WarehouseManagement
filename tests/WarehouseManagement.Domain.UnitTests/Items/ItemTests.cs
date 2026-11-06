@@ -165,4 +165,39 @@ public class ItemTests
         Assert.NotEqual(item1.Id, item2.Id);
     }
 
+    [Fact]
+    [Trait("BR", "BR-27")]
+    public void Discontinue_ActiveItem_SetsStatusToDiscontinued()
+    {
+        // Arrange
+        string sku = "VALID-SKU";
+        string name = "Valid Item Name";
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
+        decimal reorderPoint = 10;
+        bool tracksExpiry = false;
+        Item item = Item.Create(sku, name, unitOfMeasure, reorderPoint, tracksExpiry);
+
+        // Act
+        item.Discontinue();
+
+        // Assert
+        Assert.Equal(ItemStatus.Discontinued, item.Status);
+    }
+
+    [Fact]
+    [Trait("BR", "BR-27")]
+    public void Discontinue_NonActiveItem_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        string sku = "VALID-SKU";
+        string name = "Valid Item Name";
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
+        decimal reorderPoint = 10;
+        bool tracksExpiry = false;
+        Item item = Item.Create(sku, name, unitOfMeasure, reorderPoint, tracksExpiry);
+        item.Discontinue();
+
+        // Act & Assert
+        Assert.Throws<BusinessRuleException>(() => item.Discontinue());
+    }
 }

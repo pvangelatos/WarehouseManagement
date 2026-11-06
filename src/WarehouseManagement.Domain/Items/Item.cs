@@ -34,7 +34,6 @@ public sealed class Item
         UnitOfMeasure = unitOfMeasure;
         ReorderPoint = reorderPoint;
         TracksExpiry = tracksExpiry;
-
     }
     public static Item Create(
         string sku,
@@ -62,6 +61,14 @@ public sealed class Item
             quantity,
             tracksExpiry
         );
+    }
+
+    public void Discontinue()
+    {
+        if (Status is not ItemStatus.Active)
+            throw new BusinessRuleException($"Item is already {Status}.");
+
+        Status = ItemStatus.Discontinued;
     }
 
 }
