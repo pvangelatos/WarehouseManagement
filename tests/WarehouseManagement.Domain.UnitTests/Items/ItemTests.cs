@@ -3,10 +3,15 @@ using WarehouseManagement.Domain.Items;
 
 namespace WarehouseManagement.Domain.UnitTests.Items;
 
-
-
 public class ItemTests
 {
+    private static Item CreateItem(
+        string sku = "VALID-SKU",
+        string name = "Valid Item Name",
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box,
+        decimal reorderPoint = 10,
+        bool tracksExpiry = false)
+        => Item.Create(sku, name, unitOfMeasure, reorderPoint, tracksExpiry);
 
     [Fact]
     [Trait("BR", "BR-26")]
@@ -169,12 +174,7 @@ public class ItemTests
     public void Discontinue_ActiveItem_SetsStatusToDiscontinued()
     {
         // Arrange
-        string sku = "VALID-SKU";
-        string name = "Valid Item Name";
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
-        decimal reorderPoint = 10;
-        bool tracksExpiry = false;
-        Item item = Item.Create(sku, name, unitOfMeasure, reorderPoint, tracksExpiry);
+        Item item = CreateItem();
 
         // Act
         item.Discontinue();
@@ -188,12 +188,7 @@ public class ItemTests
     public void Discontinue_NonActiveItem_ThrowsBusinessRuleException()
     {
         // Arrange
-        string sku = "VALID-SKU";
-        string name = "Valid Item Name";
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
-        decimal reorderPoint = 10;
-        bool tracksExpiry = false;
-        Item item = Item.Create(sku, name, unitOfMeasure, reorderPoint, tracksExpiry);
+        Item item = CreateItem();
         item.Discontinue();
 
         // Act & Assert
@@ -205,12 +200,7 @@ public class ItemTests
     public void Discontinue_InactiveItem_ThrowsBusinessRuleException()
     {
         // Arrange
-        string sku = "VALID-SKU";
-        string name = "Valid Item Name";
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
-        decimal reorderPoint = 10;
-        bool tracksExpiry = false;
-        Item item = Item.Create(sku, name, unitOfMeasure, reorderPoint, tracksExpiry);
+        Item item = CreateItem();
         item.Discontinue();
         Quantity currentStock = Quantity.Zero;
         item.Deactivate(currentStock);
@@ -224,12 +214,7 @@ public class ItemTests
     public void ChangeReorderPoint_WithValidParameters_ChangesReorderPoint()
     {
         // Arrange
-        string sku = "VALID-SKU";
-        string name = "Valid Item Name";
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
-        decimal initialReorderPoint = 10;
-        bool tracksExpiry = false;
-        Item item = Item.Create(sku, name, unitOfMeasure, initialReorderPoint, tracksExpiry);
+        Item item = CreateItem();
         decimal newReorderPoint = 20;
 
         // Act
@@ -244,12 +229,7 @@ public class ItemTests
     public void ChangeReorderPoint_ToZero_ChangesReorderPoint()
     {
         // Arrange
-        string sku = "VALID-SKU";
-        string name = "Valid Item Name";
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Piece;
-        decimal initialReorderPoint = 12;
-        bool tracksExpiry = false;
-        Item item = Item.Create(sku, name, unitOfMeasure, initialReorderPoint, tracksExpiry);
+        Item item = CreateItem();
         decimal newReorderPoint = 0;
 
         // Act
@@ -264,12 +244,7 @@ public class ItemTests
     public void ChangeReorderPoint_DecimalToUnitWithNoDecimal_ThrowsBusinessRuleException()
     {
         // Arrange
-        string sku = "VALID-SKU";
-        string name = "Valid Item Name";
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
-        decimal initialReorderPoint = 10;
-        bool tracksExpiry = false;
-        Item item = Item.Create(sku, name, unitOfMeasure, initialReorderPoint, tracksExpiry);
+        Item item = CreateItem(unitOfMeasure: UnitOfMeasure.Piece);
         decimal newReorderPoint = 5.5m;
 
         // Act & Assert
@@ -281,12 +256,7 @@ public class ItemTests
     public void ChangeReorderPoint_WithNegativeValue_ThrowsBusinessRuleException()
     {
         // Arrange
-        string sku = "VALID-SKU";
-        string name = "Valid Item Name";
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
-        decimal initialReorderPoint = 10;
-        bool tracksExpiry = false;
-        Item item = Item.Create(sku, name, unitOfMeasure, initialReorderPoint, tracksExpiry);
+        Item item = CreateItem();
         decimal newReorderPoint = -5;
 
         // Act & Assert
@@ -298,12 +268,7 @@ public class ItemTests
     public void ChangeReorderPoint_DiscontinuedItem_ThrowsBusinessRuleException()
     {
         // Arrange
-        string sku = "VALID-SKU";
-        string name = "Valid Item Name";
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
-        decimal initialReorderPoint = 10;
-        bool tracksExpiry = false;
-        Item item = Item.Create(sku, name, unitOfMeasure, initialReorderPoint, tracksExpiry);
+        Item item = CreateItem();
         decimal newReorderPoint = 2;
         item.Discontinue();
 
@@ -315,12 +280,8 @@ public class ItemTests
     public void ChangeReorderPoint_InvalidValue_KeepsPreviousReorderPoint()
     {
         // Arrange
-        string sku = "VALID-SKU";
-        string name = "Valid Item Name";
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
         decimal initialReorderPoint = 10;
-        bool tracksExpiry = false;
-        Item item = Item.Create(sku, name, unitOfMeasure, initialReorderPoint, tracksExpiry);
+        Item item = CreateItem(reorderPoint: initialReorderPoint);
         decimal newReorderPoint = -2;
 
         // Act & Assert
@@ -333,12 +294,7 @@ public class ItemTests
     public void ChangeReorderPoint_InactiveItem_ThrowsBusinessRuleException()
     {
         // Arrange
-        string sku = "VALID-SKU";
-        string name = "Valid Item Name";
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
-        decimal initialReorderPoint = 10;
-        bool tracksExpiry = false;
-        Item item = Item.Create(sku, name, unitOfMeasure, initialReorderPoint, tracksExpiry);
+        Item item = CreateItem();
         decimal newReorderPoint = 2;
         Quantity currentStock = Quantity.Zero;
         item.Discontinue();
@@ -353,12 +309,7 @@ public class ItemTests
     public void Deactivate_DiscontinuedItemWithZeroStock_SetsStatusToInactive()
     {
         // Arrange
-        string sku = "VALID-SKU";
-        string name = "Valid Item Name";
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
-        decimal reorderPoint = 10;
-        bool tracksExpiry = false;
-        Item item = Item.Create(sku, name, unitOfMeasure, reorderPoint, tracksExpiry);
+        Item item = CreateItem();
         item.Discontinue();
         Quantity currentStock = Quantity.Zero;
 
@@ -374,12 +325,7 @@ public class ItemTests
     public void Deactivate_ActiveItem_ThrowsBusinessRuleException()
     {
         // Arrange
-        string sku = "VALID-SKU";
-        string name = "Valid Item Name";
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Pair;
-        decimal reorderPoint = 5;
-        bool tracksExpiry = false;
-        Item item = Item.Create(sku, name, unitOfMeasure, reorderPoint, tracksExpiry);
+        Item item = CreateItem();
         Quantity currentStock = Quantity.Zero;
 
         // Act & Assert
@@ -391,14 +337,9 @@ public class ItemTests
     public void Deactivate_DiscontinuedItemWithNonZeroStock_ThrowsBusinessRuleException()
     {
         // Arrange
-        string sku = "VALID-SKU";
-        string name = "Valid Item Name";
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Kilogram;
-        decimal reorderPoint = 10;
-        bool tracksExpiry = false;
-        Item item = Item.Create(sku, name, unitOfMeasure, reorderPoint, tracksExpiry);
+        Item item = CreateItem();
         item.Discontinue();
-        Quantity currentStock = Quantity.Create(5, unitOfMeasure);
+        Quantity currentStock = Quantity.Create(5, item.UnitOfMeasure);
 
         // Act & Assert
         Assert.Throws<BusinessRuleException>(() => item.Deactivate(currentStock));
@@ -409,12 +350,7 @@ public class ItemTests
     public void Deactivate_InactiveItem_ThrowsBusinessRuleException()
     {
         // Arrange
-        string sku = "VALID-SKU";
-        string name = "Valid Item Name";
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Kilogram;
-        decimal reorderPoint = 10;
-        bool tracksExpiry = false;
-        Item item = Item.Create(sku, name, unitOfMeasure, reorderPoint, tracksExpiry);
+        Item item = CreateItem();
         item.Discontinue();
         Quantity currentStock = Quantity.Zero;
         item.Deactivate(currentStock);
@@ -427,12 +363,7 @@ public class ItemTests
     public void Deactivate_ItemWithNullCurrentStock_ThrowsArgumentNullException()
     {
         // Arrange
-        string sku = "VALID-SKU";
-        string name = "Valid Item Name";
-        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Kilogram;
-        decimal reorderPoint = 10;
-        bool tracksExpiry = false;
-        Item item = Item.Create(sku, name, unitOfMeasure, reorderPoint, tracksExpiry);
+        Item item = CreateItem();
         item.Discontinue();
         Quantity? currentStock = null;
 

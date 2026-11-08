@@ -19,6 +19,8 @@
 - [x] 2.3c-1 Item.Discontinue (BR-27) + tests 
 - [x] 2.3c-2 — Item.ChangeReorderPoint (BR-30)
 - [x] 2.3c-3 — Item.Deactivate (BR-27, BR-29) + tests
+- [x] 2.3d — PR feature/2.3-item → main
+- [x] 2.3e Test helper CreateItem (refactor ItemTests)
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -52,6 +54,7 @@
 | Όνομα υλικού | `string` με έλεγχο μέσα στο `Item` (όχι value object) | Χρησιμοποιείται μόνο από το `Item`, χωρίς πράξεις· YAGNI |
 | Σειρά ελέγχων σε methods | Πρώτα οι προϋποθέσεις κατάστασης, μετά η εγκυρότητα των δεδομένων, και αλλαγή κατάστασης μόνο αφού περάσουν όλοι οι έλεγχοι | Ο χρήστης βλέπει πρώτα το σφάλμα που ακυρώνει την ενέργεια· μετά από exception το entity μένει αμετάβλητο (always-valid) |
 | Έλεγχος αποθέματος στο Deactivate (BR-29) | Το απόθεμα περνά ως παράμετρος, `Deactivate(Quantity currentStock)`. Μετάβαση σε domain service με `internal` method όταν υπάρξει το aggregate αποθέματος | Ο κανόνας ζει και ελέγχεται στο Domain από τώρα· το aggregate αποθέματος δεν υπάρχει ακόμα (YAGNI). Το ρίσκο λάθους τιμής από τον caller καλύπτεται με tests στο Application |
+| Δημιουργία Item στα tests | Helper `CreateItem` με optional parameters για το Arrange· τα tests του `Create` καλούν απευθείας `Item.Create` | Κάθε test δείχνει μόνο τις τιμές που επηρεάζουν το σενάριο· ο helper δεν κρύβει τη method που ελέγχεται |
 
 ## Επόμενο βήμα
-Task 2.3d — PR feature/2.3-item → main
+Task 2.4..
