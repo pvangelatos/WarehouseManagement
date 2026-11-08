@@ -14,7 +14,7 @@ public sealed class Item
 
     public UnitOfMeasure UnitOfMeasure { get; }
 
-    public Quantity ReorderPoint { get; }
+    public Quantity ReorderPoint { get; private set; }
 
     public bool TracksExpiry { get; }
 
@@ -71,4 +71,13 @@ public sealed class Item
         Status = ItemStatus.Discontinued;
     }
 
+    public void ChangeReorderPoint(decimal newReorderPoint)
+    {
+        if (Status is not ItemStatus.Active)
+            throw new BusinessRuleException($"Cannot change reorder point for item with status {Status}.");
+
+        Quantity newQuantity = Quantity.Create(newReorderPoint, UnitOfMeasure);
+
+        ReorderPoint = newQuantity;
+    }
 }

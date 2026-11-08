@@ -156,7 +156,6 @@ public class ItemTests
         decimal reorderPoint1 = 10;
         bool tracksExpiry1 = false;
 
-
         // Act
         Item item1 = Item.Create(sku1, name1, unitOfMeasure1, reorderPoint1, tracksExpiry1);
         Item item2 = Item.Create(sku1, name1, unitOfMeasure1, reorderPoint1, tracksExpiry1);
@@ -199,5 +198,114 @@ public class ItemTests
 
         // Act & Assert
         Assert.Throws<BusinessRuleException>(() => item.Discontinue());
+    }
+
+    [Fact]
+    [Trait("BR", "BR-30")]
+    public void ChangeReorderPoint_WithValidParameters_ChangesReorderPoint()
+    {
+        // Arrange
+        string sku = "VALID-SKU";
+        string name = "Valid Item Name";
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
+        decimal initialReorderPoint = 10;
+        bool tracksExpiry = false;
+        Item item = Item.Create(sku, name, unitOfMeasure, initialReorderPoint, tracksExpiry);
+        decimal newReorderPoint = 20;
+
+        // Act
+        item.ChangeReorderPoint(newReorderPoint);
+
+        // Assert
+        Assert.Equal(newReorderPoint, item.ReorderPoint.Value);
+    }
+
+    [Fact]
+    [Trait("BR", "BR-26")]
+    public void ChangeReorderPoint_ToZero_ChangesReorderPoint()
+    {
+        // Arrange
+        string sku = "VALID-SKU";
+        string name = "Valid Item Name";
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Piece;
+        decimal initialReorderPoint = 12;
+        bool tracksExpiry = false;
+        Item item = Item.Create(sku, name, unitOfMeasure, initialReorderPoint, tracksExpiry);
+        decimal newReorderPoint = 0;
+
+        // Act
+        item.ChangeReorderPoint(newReorderPoint);
+
+        // Assert
+        Assert.Equal(newReorderPoint, item.ReorderPoint.Value);
+    }
+
+    [Fact]
+    [Trait("BR", "BR-22")]
+    public void ChangeReorderPoint_DecimalToUnitWithNoDecimal_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        string sku = "VALID-SKU";
+        string name = "Valid Item Name";
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
+        decimal initialReorderPoint = 10;
+        bool tracksExpiry = false;
+        Item item = Item.Create(sku, name, unitOfMeasure, initialReorderPoint, tracksExpiry);
+        decimal newReorderPoint = 5.5m;
+
+        // Act & Assert
+        Assert.Throws<BusinessRuleException>(() => item.ChangeReorderPoint(newReorderPoint));
+    }
+
+    [Fact]
+    [Trait("BR", "BR-21")]
+    public void ChangeReorderPoint_WithNegativeValue_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        string sku = "VALID-SKU";
+        string name = "Valid Item Name";
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
+        decimal initialReorderPoint = 10;
+        bool tracksExpiry = false;
+        Item item = Item.Create(sku, name, unitOfMeasure, initialReorderPoint, tracksExpiry);
+        decimal newReorderPoint = -5;
+
+        // Act & Assert
+        Assert.Throws<BusinessRuleException>(() => item.ChangeReorderPoint(newReorderPoint));
+    }
+
+    [Fact]
+    [Trait("BR", "BR-30")]
+    public void ChangeReorderpoint_DiscontinuedItem_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        string sku = "VALID-SKU";
+        string name = "Valid Item Name";
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
+        decimal initialReorderPoint = 10;
+        bool tracksExpiry = false;
+        Item item = Item.Create(sku, name, unitOfMeasure, initialReorderPoint, tracksExpiry);
+        decimal newReorderPoint = 2;
+        item.Discontinue();
+
+        // Act & Assert
+        Assert.Throws<BusinessRuleException>(() => item.ChangeReorderPoint(newReorderPoint));
+    }
+
+    [Fact]
+    public void ChangeReorderPoint_InvalidValue_KeepsPreviousReorderPoint()
+    {
+        // Arrange
+        string sku = "VALID-SKU";
+        string name = "Valid Item Name";
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
+        decimal initialReorderPoint = 10;
+        bool tracksExpiry = false;
+        Item item = Item.Create(sku, name, unitOfMeasure, initialReorderPoint, tracksExpiry);
+        decimal newReorderPoint = -2;
+
+        // Act & Assert
+        Assert.Throws<BusinessRuleException>(() => item.ChangeReorderPoint(newReorderPoint));
+        Assert.Equal(initialReorderPoint, item.ReorderPoint.Value);
     }
 }
