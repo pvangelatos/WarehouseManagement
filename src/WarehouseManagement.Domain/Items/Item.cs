@@ -80,4 +80,17 @@ public sealed class Item
 
         ReorderPoint = newQuantity;
     }
+
+    public void Deactivate(Quantity currentStock)
+    {
+        ArgumentNullException.ThrowIfNull(currentStock);
+
+        if (Status is not ItemStatus.Discontinued)
+            throw new BusinessRuleException($"Cannot deactivate item with status {Status}.");
+
+        if (currentStock != Quantity.Zero)
+            throw new BusinessRuleException($"Cannot deactivate item with {currentStock.Value} {UnitOfMeasure.UnEceCode()} stock. You must have zero stock to deactivate an item.");
+
+        Status = ItemStatus.Inactive;
+    }
 }

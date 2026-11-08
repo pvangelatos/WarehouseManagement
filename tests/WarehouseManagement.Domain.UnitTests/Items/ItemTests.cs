@@ -201,6 +201,25 @@ public class ItemTests
     }
 
     [Fact]
+    [Trait("BR", "BR-27")]
+    public void Discontinue_InactiveItem_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        string sku = "VALID-SKU";
+        string name = "Valid Item Name";
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
+        decimal reorderPoint = 10;
+        bool tracksExpiry = false;
+        Item item = Item.Create(sku, name, unitOfMeasure, reorderPoint, tracksExpiry);
+        item.Discontinue();
+        Quantity currentStock = Quantity.Zero;
+        item.Deactivate(currentStock);
+
+        // Act & Assert
+        Assert.Throws<BusinessRuleException>(() => item.Discontinue());
+    }
+
+    [Fact]
     [Trait("BR", "BR-30")]
     public void ChangeReorderPoint_WithValidParameters_ChangesReorderPoint()
     {
@@ -276,7 +295,7 @@ public class ItemTests
 
     [Fact]
     [Trait("BR", "BR-30")]
-    public void ChangeReorderpoint_DiscontinuedItem_ThrowsBusinessRuleException()
+    public void ChangeReorderPoint_DiscontinuedItem_ThrowsBusinessRuleException()
     {
         // Arrange
         string sku = "VALID-SKU";
@@ -307,5 +326,117 @@ public class ItemTests
         // Act & Assert
         Assert.Throws<BusinessRuleException>(() => item.ChangeReorderPoint(newReorderPoint));
         Assert.Equal(initialReorderPoint, item.ReorderPoint.Value);
+    }
+
+    [Fact]
+    [Trait("BR", "BR-30")]
+    public void ChangeReorderPoint_InactiveItem_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        string sku = "VALID-SKU";
+        string name = "Valid Item Name";
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
+        decimal initialReorderPoint = 10;
+        bool tracksExpiry = false;
+        Item item = Item.Create(sku, name, unitOfMeasure, initialReorderPoint, tracksExpiry);
+        decimal newReorderPoint = 2;
+        Quantity currentStock = Quantity.Zero;
+        item.Discontinue();
+        item.Deactivate(currentStock);
+
+        // Act & Assert
+        Assert.Throws<BusinessRuleException>(() => item.ChangeReorderPoint(newReorderPoint));
+    }
+
+    [Fact]
+    [Trait("BR", "BR-29")]
+    public void Deactivate_DiscontinuedItemWithZeroStock_SetsStatusToInactive()
+    {
+        // Arrange
+        string sku = "VALID-SKU";
+        string name = "Valid Item Name";
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Box;
+        decimal reorderPoint = 10;
+        bool tracksExpiry = false;
+        Item item = Item.Create(sku, name, unitOfMeasure, reorderPoint, tracksExpiry);
+        item.Discontinue();
+        Quantity currentStock = Quantity.Zero;
+
+        // Act
+        item.Deactivate(currentStock);
+
+        // Assert
+        Assert.Equal(ItemStatus.Inactive, item.Status);
+    }
+
+    [Fact]
+    [Trait("BR", "BR-27")]
+    public void Deactivate_ActiveItem_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        string sku = "VALID-SKU";
+        string name = "Valid Item Name";
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Pair;
+        decimal reorderPoint = 5;
+        bool tracksExpiry = false;
+        Item item = Item.Create(sku, name, unitOfMeasure, reorderPoint, tracksExpiry);
+        Quantity currentStock = Quantity.Zero;
+
+        // Act & Assert
+        Assert.Throws<BusinessRuleException>(() => item.Deactivate(currentStock));
+    }
+
+    [Fact]
+    [Trait("BR", "BR-29")]
+    public void Deactivate_DiscontinuedItemWithNonZeroStock_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        string sku = "VALID-SKU";
+        string name = "Valid Item Name";
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Kilogram;
+        decimal reorderPoint = 10;
+        bool tracksExpiry = false;
+        Item item = Item.Create(sku, name, unitOfMeasure, reorderPoint, tracksExpiry);
+        item.Discontinue();
+        Quantity currentStock = Quantity.Create(5, unitOfMeasure);
+
+        // Act & Assert
+        Assert.Throws<BusinessRuleException>(() => item.Deactivate(currentStock));
+    }
+
+    [Fact]
+    [Trait("BR", "BR-27")]
+    public void Deactivate_InactiveItem_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        string sku = "VALID-SKU";
+        string name = "Valid Item Name";
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Kilogram;
+        decimal reorderPoint = 10;
+        bool tracksExpiry = false;
+        Item item = Item.Create(sku, name, unitOfMeasure, reorderPoint, tracksExpiry);
+        item.Discontinue();
+        Quantity currentStock = Quantity.Zero;
+        item.Deactivate(currentStock);
+
+        // Act & Assert
+        Assert.Throws<BusinessRuleException>(() => item.Deactivate(currentStock));
+    }
+
+    [Fact]
+    public void Deactivate_ItemWithNullCurrentStock_ThrowsArgumentNullException()
+    {
+        // Arrange
+        string sku = "VALID-SKU";
+        string name = "Valid Item Name";
+        UnitOfMeasure unitOfMeasure = UnitOfMeasure.Kilogram;
+        decimal reorderPoint = 10;
+        bool tracksExpiry = false;
+        Item item = Item.Create(sku, name, unitOfMeasure, reorderPoint, tracksExpiry);
+        item.Discontinue();
+        Quantity? currentStock = null;
+
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => item.Deactivate(currentStock!));
     }
 }
