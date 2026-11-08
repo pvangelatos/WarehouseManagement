@@ -19,6 +19,7 @@
 - [x] 2.3c-1 Item.Discontinue (BR-27) + tests 
 - [x] 2.3c-2 — Item.ChangeReorderPoint (BR-30)
 - [x] 2.3c-3 — Item.Deactivate (BR-27, BR-29) + tests
+- [x] 2.3d — PR feature/2.3-item → main
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -54,4 +55,4 @@
 | Έλεγχος αποθέματος στο Deactivate (BR-29) | Το απόθεμα περνά ως παράμετρος, `Deactivate(Quantity currentStock)`. Μετάβαση σε domain service με `internal` method όταν υπάρξει το aggregate αποθέματος | Ο κανόνας ζει και ελέγχεται στο Domain από τώρα· το aggregate αποθέματος δεν υπάρχει ακόμα (YAGNI). Το ρίσκο λάθους τιμής από τον caller καλύπτεται με tests στο Application |
 
 ## Επόμενο βήμα
-Task 2.3d — PR feature/2.3-item → main
+Task 2.3e.
