@@ -14,6 +14,11 @@
 - [x] 2.2a docs/domain.md: ποσότητες και μονάδες μέτρησης (BR-21 έως BR-25)
 - [x] 2.2b Enum UnitOfMeasure με extensions (AllowedDecimals, UnEceCode) + tests (BR-24)
 - [x] 2.2c Value object Quantity (validation BR-21..23, operators, Zero) + tests 
+- [x] 2.3a docs/domain.md: κύκλος ζωής Item, BR-26..30
+- [x] 2.3b Entity Item
+- [x] 2.3c-1 Item.Discontinue (BR-27) + tests 
+- [x] 2.3c-2 — Item.ChangeReorderPoint (BR-30)
+- [x] 2.3c-3 — Item.Deactivate (BR-27, BR-29) + tests
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -40,6 +45,13 @@
 | Έλεγχος δεκαδικών | `decimal.Round(value, n) != value` και όχι `decimal.Scale` | Το `Scale` μετρά και τα trailing zeros (1.2300 = 4), άρα θα απέρριπτε έγκυρες τιμές |
 | Operators του Quantity | Χωρίς μονάδα, μέσω private constructor | Άθροισμα/διαφορά έγκυρων ποσοτήτων δεν αυξάνει τα δεκαδικά. Η συμβατότητα μονάδων εξασφαλίζεται από το `Item` (BR-25) |
 | Test data με decimal | `TheoryData` + `[MemberData]` | Τα attributes δεν δέχονται `decimal`, και το `double` χάνει τα trailing zeros |
+| Ταυτότητα Item | Surrogate key (`Guid`, v7) + SKU ως μοναδικός business identifier | Το Id δεν εξαρτάται από business δεδομένα· οι χρήστες ψάχνουν με SKU, το σύστημα συνδέει με Id |
+| Entities | `class`, όχι `record` | Ισότητα κατά ταυτότητα· το `with` θα δημιουργούσε αντίγραφα της ίδιας entity |
+| Κύκλος ζωής Item | Active → Discontinued → Inactive, μόνο προς τα εμπρός | Αντικατοπτρίζει την πραγματική απόσυρση υλικού: πρώτα εξάντληση υπολοίπου, μετά κλείσιμο |
+| Κανόνες εκτός Item | Μοναδικότητα SKU και ιστορικό κινήσεων (BR-19) ελέγχονται στο Application layer | Το Item δεν γνωρίζει άλλα υλικά ούτε τις κινήσεις του |
+| Όνομα υλικού | `string` με έλεγχο μέσα στο `Item` (όχι value object) | Χρησιμοποιείται μόνο από το `Item`, χωρίς πράξεις· YAGNI |
+| Σειρά ελέγχων σε methods | Πρώτα οι προϋποθέσεις κατάστασης, μετά η εγκυρότητα των δεδομένων, και αλλαγή κατάστασης μόνο αφού περάσουν όλοι οι έλεγχοι | Ο χρήστης βλέπει πρώτα το σφάλμα που ακυρώνει την ενέργεια· μετά από exception το entity μένει αμετάβλητο (always-valid) |
+| Έλεγχος αποθέματος στο Deactivate (BR-29) | Το απόθεμα περνά ως παράμετρος, `Deactivate(Quantity currentStock)`. Μετάβαση σε domain service με `internal` method όταν υπάρξει το aggregate αποθέματος | Ο κανόνας ζει και ελέγχεται στο Domain από τώρα· το aggregate αποθέματος δεν υπάρχει ακόμα (YAGNI). Το ρίσκο λάθους τιμής από τον caller καλύπτεται με tests στο Application |
 
 ## Επόμενο βήμα
-Task 2.3 — Entity Item (SKU, UnitOfMeasure, BR-19, BR-25)
+Task 2.3d — PR feature/2.3-item → main
