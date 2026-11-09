@@ -1,4 +1,5 @@
-﻿using WarehouseManagement.Domain.Locations;
+﻿using WarehouseManagement.Domain.Exceptions;
+using WarehouseManagement.Domain.Locations;
 
 namespace WarehouseManagement.Domain.UnitTests.Locations;
 
@@ -54,5 +55,66 @@ public class LocationTests
         Assert.NotEqual(firstLocation, secondLocation);
     }
 
+    [Fact]
+    [Trait("BR", "BR-33")]
+    public void Deactivate_ActiveAndEmpty_SetsStatusToInactive()
+    {
+        // Arrange
+        var location = CreateLocation();
 
+        // Act
+        location.Deactivate(isEmpty: true);
+
+        // Assert
+        Assert.Equal(LocationStatus.Inactive, location.Status);
+    }
+
+    [Fact]
+    [Trait("BR", "BR-33")]
+    public void Deactivate_AlreadyInactive_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        var location = CreateLocation();
+        location.Deactivate(isEmpty: true);
+
+        // Act & Assert
+        Assert.Throws<BusinessRuleException>(() => location.Deactivate(isEmpty: true));
+    }
+
+    [Fact]
+    [Trait("BR", "BR-18")]
+    public void Deactivate_NotEmpty_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        var location = CreateLocation();
+
+        // Act & Assert
+        Assert.Throws<BusinessRuleException>(() => location.Deactivate(isEmpty: false));
+    }
+
+    [Fact]
+    [Trait("BR", "BR-18")]
+    public void Deactivate_NotEmpty_StatusRemainsActive()
+    {
+        // Arrange
+        var location = CreateLocation();
+
+        // Act & Assert
+        Assert.Throws<BusinessRuleException>(() => location.Deactivate(isEmpty: false));
+        Assert.Equal(LocationStatus.Active, location.Status);
+    }
+
+    [Fact]
+    [Trait("BR", "BR-18")]
+    [Trait("BR", "BR-33")]
+    public void Deactivate_AlreadyInactiveAndNotEmpty_ThrowsStateErrorFirst()
+    {
+        // Arrange
+        var location = CreateLocation();
+        location.Deactivate(isEmpty: true);
+
+        // Act & Assert
+        var exception = Assert.Throws<BusinessRuleException>(() => location.Deactivate(isEmpty: false));
+        Assert.Contains("already inactive", exception.Message);
+    }
 }

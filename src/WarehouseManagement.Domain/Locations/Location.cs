@@ -1,4 +1,6 @@
-﻿namespace WarehouseManagement.Domain.Locations;
+﻿using WarehouseManagement.Domain.Exceptions;
+
+namespace WarehouseManagement.Domain.Locations;
 
 public sealed class Location
 {
@@ -19,5 +21,16 @@ public sealed class Location
         Guid id = Guid.CreateVersion7();
 
         return new Location(id, code);
+    }
+
+    public void Deactivate(bool isEmpty)
+    {
+        if (Status is LocationStatus.Inactive)
+            throw new BusinessRuleException($"This location {Code} is already inactive");
+
+        if (!isEmpty)
+            throw new BusinessRuleException($"Location {Code} is not empty. Transfer its stock to another location before deactivating it");
+
+        Status = LocationStatus.Inactive;
     }
 }
