@@ -1,4 +1,6 @@
-﻿using WarehouseManagement.Domain.Exceptions;
+﻿using System.Text.RegularExpressions;
+
+using WarehouseManagement.Domain.Exceptions;
 
 namespace WarehouseManagement.Domain.Locations;
 
@@ -35,5 +37,22 @@ public sealed record LocationCode
             throw new BusinessRuleException($"Level must be between {MinLevel} and {MaxLevel}.");
 
         return new LocationCode(aisle, bay, level);
+    }
+
+    public static LocationCode Parse(string? input)
+    {
+        string? trimmedCode = input?.Trim();
+        if (string.IsNullOrWhiteSpace(trimmedCode))
+            throw new BusinessRuleException("Location code cannot be null or empty.");
+
+        var match = Regex.Match(trimmedCode, @"^(?<aisle>[0-9]{1,3})-(?<bay>[0-9]{1,2})-(?<level>[0-9]{1,2})$");
+        if (!match.Success)
+            throw new BusinessRuleException("Location code must be in the format AAA-BB-LL (aisle-bay-level), using digits only, e.g. \"001-02-04\".");
+
+        int aisle = int.Parse(match.Groups["aisle"].Value);
+        int bay = int.Parse(match.Groups["bay"].Value);
+        int level = int.Parse(match.Groups["level"].Value);
+
+        return Create(aisle, bay, level);
     }
 }
