@@ -23,6 +23,7 @@
 - [x] 2.3e Test helper CreateItem (refactor ItemTests)
 - [x] 2.4a docs/domain.md: θέσεις αποθήκευσης (BR-18 αναθεώρηση, BR-31..35)
 - [x] 2.4b Value object LocationCode (Create, Parse, normalization) + tests (BR-31)
+- [x] 2.4c Entity Location (Create, Deactivate, Activate) + tests (BR-18, BR-32..34)
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -65,6 +66,10 @@
 | Δημιουργία LocationCode | Create(int, int, int) για έλεγχο ορίων, Parse(string) για μορφή, και η Parse καλεί την Create | Ένα μόνο σημείο ελέγχου ορίων· το regex ελέγχει μορφή και η Create τιμή |
 | Ψηφία σε regex | [0-9] και όχι \d | Στο .NET το \d ταιριάζει κάθε ψηφίο Unicode (π.χ. αραβικά, fullwidth), ενώ το int.Parse δέχεται μόνο ASCII· η είσοδος θα περνούσε τον έλεγχο μορφής και θα έσκαγε με FormatException |
 | ToString σε value objects | Override που επιστρέφει την κανονική μορφή | Το default ToString του record τυπώνει όλα τα properties· χρησιμοποιείται σιωπηρά σε interpolation, logs και μηνύματα |
+| Είσοδος του Location.Create | Δέχεται `LocationCode` και όχι string ή αριθμούς | Το `LocationCode` έχει δύο εισόδους (Create, Parse)· με private constructor κάθε instance είναι ήδη έγκυρο, οπότε το entity δεν επαναλαμβάνει ελέγχους ούτε διπλασιάζει το API. Διαφέρει από το `Item.Create(string sku)` γιατί το `Sku` έχει μία μόνο είσοδο |
+| Κατάσταση θέσης | `enum LocationStatus` (Active = 1, Inactive = 2) και όχι `bool` | Καθαρά μηνύματα λάθους, συνέπεια με το `ItemStatus`, επέκταση χωρίς αλλαγή τύπου. Τα enums ξεκινούν από 1 ώστε το default 0 να σημαίνει «δεν ορίστηκε» |
+| Απογραφή και θέση (BR-16) | Δεν είναι κατάσταση του `Location`· θα ελέγχεται από το μελλοντικό aggregate `StockCount` | Η πληροφορία ανήκει στην απογραφή· αποφεύγονται συγκρουόμενες καταστάσεις και δύο σημεία αλήθειας |
+| Ένα σενάριο ανά test | Σε κάθε test μόνο ένας λόγος αποτυχίας· η σειρά ελέγχων ελέγχεται από ξεχωριστό test | Αλλιώς ένα test περνά για λάθος λόγο και δεν πιάνει την αφαίρεση ενός κανόνα |
 
 ## Επόμενο βήμα
-Task 2.4c — Entity Location + tests (BR-18, BR-32..34)
+Task 2.4d — PR feature/2.4-location → main
