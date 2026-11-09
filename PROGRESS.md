@@ -24,6 +24,7 @@
 - [x] 2.4a docs/domain.md: θέσεις αποθήκευσης (BR-18 αναθεώρηση, BR-31..35)
 - [x] 2.4b Value object LocationCode (Create, Parse, normalization) + tests (BR-31)
 - [x] 2.4c Entity Location (Create, Deactivate, Activate) + tests (BR-18, BR-32..34)
+- [x] 2.4d PR feature/2.4-location → main
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -72,4 +73,4 @@
 | Ένα σενάριο ανά test | Σε κάθε test μόνο ένας λόγος αποτυχίας· η σειρά ελέγχων ελέγχεται από ξεχωριστό test | Αλλιώς ένα test περνά για λάθος λόγο και δεν πιάνει την αφαίρεση ενός κανόνα |
 
 ## Επόμενο βήμα
-Task 2.4d — PR feature/2.4-location → main
+Task 2.5 — Κινήσεις αποθέματος (θα οριστεί)
