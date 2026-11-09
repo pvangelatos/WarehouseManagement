@@ -36,17 +36,20 @@ public class LocationCodeTests
     }
 
     [Theory]
-    [InlineData(" 1-2-4 ", "001-02-04")]
-    [InlineData("10-2-3", "010-02-03")]
-    [InlineData("001-02-04", "001-02-04")]
-    [InlineData("12-3-45", "012-03-45")]
-    public void Parse_ValidInput_ReturnsNormalizedCode(string input, string expected)
+    [InlineData(" 1-2-4 ", "001-02-04", 1, 2, 4)]
+    [InlineData("10-2-3", "010-02-03", 10, 2, 3)]
+    [InlineData("001-02-04", "001-02-04", 1, 2, 4)]
+    [InlineData("12-3-45", "012-03-45", 12, 3, 45)]
+    public void Parse_ValidInput_ReturnsNormalizedCode(string input, string expected, int expectedAisle, int expectedBay, int expectedLevel)
     {
         // Act
         var locationCode = LocationCode.Parse(input);
 
         // Assert
         Assert.Equal(expected, locationCode.Value);
+        Assert.Equal(expectedAisle, locationCode.Aisle);
+        Assert.Equal(expectedBay, locationCode.Bay);
+        Assert.Equal(expectedLevel, locationCode.Level);
     }
 
     [Theory]
@@ -112,9 +115,9 @@ public class LocationCodeTests
     {
         // Arrange
         var locationCode = LocationCode.Create(1, 2, 4);
-        var locationCode2 = LocationCode.Create(1, 2, 5);
+        var differentLevel = LocationCode.Create(1, 2, 5);
 
         // Act & Assert
-        Assert.NotEqual(locationCode, locationCode2);
+        Assert.NotEqual(locationCode, differentLevel);
     }
 }
