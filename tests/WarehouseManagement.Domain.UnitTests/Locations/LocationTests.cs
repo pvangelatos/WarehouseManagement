@@ -117,4 +117,48 @@ public class LocationTests
         var exception = Assert.Throws<BusinessRuleException>(() => location.Deactivate(isEmpty: false));
         Assert.Contains("already inactive", exception.Message);
     }
+
+    [Fact]
+    [Trait("BR", "BR-33")]
+    public void Activate_Inactive_SetsStatusToActive()
+    {
+        // Arrange
+        var location = CreateLocation();
+        location.Deactivate(isEmpty: true);
+
+        // Act
+        location.Activate();
+
+        // Assert
+        Assert.Equal(LocationStatus.Active, location.Status);
+    }
+
+    [Fact]
+    [Trait("BR", "BR-33")]
+    public void Activate_AlreadyActive_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        var location = CreateLocation();
+
+        // Act & Assert
+        Assert.Throws<BusinessRuleException>(() => location.Activate());
+    }
+
+    [Fact]
+    [Trait("BR", "BR-34")]
+    public void DeactivateThenActivate_KeepsSameIdAndCode()
+    {
+        // Arrange
+        var location = CreateLocation();
+        var originalId = location.Id;
+        var originalCode = location.Code;
+
+        // Act
+        location.Deactivate(isEmpty: true);
+        location.Activate();
+
+        // Assert
+        Assert.Equal(originalId, location.Id);
+        Assert.Equal(originalCode, location.Code);
+    }
 }

@@ -33,4 +33,12 @@ public sealed class Location
 
         Status = LocationStatus.Inactive;
     }
+
+    public void Activate()
+    {
+        if (Status is LocationStatus.Active)
+            throw new BusinessRuleException($"This location {Code} is already active");
+
+        Status = LocationStatus.Active;
+    }
 }
