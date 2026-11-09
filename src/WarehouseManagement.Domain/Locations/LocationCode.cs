@@ -55,4 +55,6 @@ public sealed record LocationCode
 
         return Create(aisle, bay, level);
     }
+
+    public override string ToString() => Value;
 }

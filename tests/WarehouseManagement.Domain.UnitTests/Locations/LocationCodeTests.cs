@@ -81,4 +81,40 @@ public class LocationCodeTests
         // Act & Assert
         Assert.Throws<BusinessRuleException>(() => LocationCode.Parse(input));
     }
+
+    [Fact]
+    public void ToString_ReturnsCanonicalCode()
+    {
+        // Arrange
+        var locationCode = LocationCode.Create(1, 2, 3);
+        // Act
+        string result = locationCode.ToString();
+        // Assert
+        Assert.Equal("001-02-03", result);
+    }
+
+    [Fact]
+    public void Equals_SameLocationDifferentFormat_AreEqual()
+    {
+        // Arrange
+        var fromNumbers = LocationCode.Create(1, 2, 4);
+        var fromShortCode = LocationCode.Parse("1-2-4");
+        var fromCanonicalCode = LocationCode.Parse("001-02-04");
+
+        // Act & Assert
+        Assert.Equal(fromNumbers, fromShortCode);
+        Assert.Equal(fromNumbers, fromCanonicalCode);
+        Assert.Equal(fromShortCode, fromCanonicalCode);
+    }
+
+    [Fact]
+    public void Equals_DifferentLevel_AreNotEqual()
+    {
+        // Arrange
+        var locationCode = LocationCode.Create(1, 2, 4);
+        var locationCode2 = LocationCode.Create(1, 2, 5);
+
+        // Act & Assert
+        Assert.NotEqual(locationCode, locationCode2);
+    }
 }

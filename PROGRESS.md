@@ -22,6 +22,7 @@
 - [x] 2.3d — PR feature/2.3-item → main
 - [x] 2.3e Test helper CreateItem (refactor ItemTests)
 - [x] 2.4a docs/domain.md: θέσεις αποθήκευσης (BR-18 αναθεώρηση, BR-31..35)
+- [x] 2.4b Value object LocationCode (Create, Parse, normalization) + tests (BR-31)
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -61,6 +62,9 @@
 | Κύκλος ζωής θέσης | Ενεργή ⇄ Ανενεργή, αναστρέψιμος (σε αντίθεση με το `Item`) | Το ράφι επισκευάζεται και ξαναμπαίνει σε χρήση· η αντικατάσταση στο ίδιο σημείο επανενεργοποιεί την υπάρχουσα θέση, ώστε το ιστορικό να μη χωρίζεται |
 | Ένα υλικό ανά θέση (BR-35) | Ελέγχεται στις κινήσεις και όχι στο `Location` | Η θέση δεν γνωρίζει το απόθεμά της· ο κανόνας ανήκει εκεί όπου αλλάζει το απόθεμα |
 | Έλεγχος BR-18 | `Deactivate(bool isEmpty)` | Η θέση χρειάζεται μόνο ναι/όχι. Το `Quantity` δεν έχει νόημα για θέση, γιατί το άθροισμα διαφορετικών υλικών (π.χ. ζεύγη + κιλά) δεν έχει μονάδα. Μετάβαση σε domain service μαζί με το `Item.Deactivate` |
+| Δημιουργία LocationCode | Create(int, int, int) για έλεγχο ορίων, Parse(string) για μορφή, και η Parse καλεί την Create | Ένα μόνο σημείο ελέγχου ορίων· το regex ελέγχει μορφή και η Create τιμή |
+| Ψηφία σε regex | [0-9] και όχι \d | Στο .NET το \d ταιριάζει κάθε ψηφίο Unicode (π.χ. αραβικά, fullwidth), ενώ το int.Parse δέχεται μόνο ASCII· η είσοδος θα περνούσε τον έλεγχο μορφής και θα έσκαγε με FormatException |
+| ToString σε value objects | Override που επιστρέφει την κανονική μορφή | Το default ToString του record τυπώνει όλα τα properties· χρησιμοποιείται σιωπηρά σε interpolation, logs και μηνύματα |
 
 ## Επόμενο βήμα
-Task 2.4b — Value object `LocationCode` + tests (BR-31)
+Task 2.4c — Entity Location + tests (BR-18, BR-32..34)
