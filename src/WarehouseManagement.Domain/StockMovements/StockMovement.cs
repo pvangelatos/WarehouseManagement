@@ -55,7 +55,13 @@ public sealed class StockMovement
         if (item.Status is not ItemStatus.Active)
             throw new BusinessRuleException($"Cannot receive item {item.Sku.Value} with status {item.Status}.");
 
+        if (location.Status is not LocationStatus.Active)
+            throw new BusinessRuleException($"Cannot receive stock to location {location.Code} with status {location.Status}.");
+
         Quantity quantityValue = Quantity.Create(quantity, item.UnitOfMeasure);
+
+        if (quantityValue.Value <= 0)
+            throw new BusinessRuleException("Quantity must be greater than zero.");
 
         return new StockMovement(
             Guid.CreateVersion7(),

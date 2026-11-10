@@ -209,4 +209,56 @@ public class StockMovementTests
         // Assert
         Assert.Equal("Cannot receive item VALID-SKU with status Inactive.", exception.Message);
     }
+
+    [Fact]
+    public void CreateReceipt_InactiveLocation_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        var location = CreateLocation();
+        location.Deactivate(isEmpty: true);
+
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateReceipt(location: location));
+
+        // Assert
+        Assert.Equal($"Cannot receive stock to location 001-01-00 with status Inactive.", exception.Message);
+    }
+
+    [Fact]
+    public void CreateReceipt_ZeroQuantity_ThrowsBusinessRuleException()
+    {
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateReceipt(quantity: 0));
+
+        // Assert
+        Assert.Equal("Quantity must be greater than zero.", exception.Message);
+    }
+
+    [Fact]
+    public void CreateReceipt_DecimalQuantityForWholeUnit_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        decimal quantity = 1.5m;
+
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateReceipt(quantity: quantity));
+
+        // Assert
+        Assert.Equal("Quantity for Box cannot have more than 0 decimal places.", exception.Message);
+
+    }
+
+    [Fact]
+    public void CreateReceipt_DiscontinuedItemAndZeroQuantity_ThrowsItemStatusErrorFirst()
+    {
+        // Arrange
+        var item = CreateItem();
+        item.Discontinue();
+
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateReceipt(item: item, quantity: 0));
+
+        // Assert
+        Assert.Equal("Cannot receive item VALID-SKU with status Discontinued.", exception.Message);
+    }
 }
