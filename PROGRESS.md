@@ -25,6 +25,10 @@
 - [x] 2.4b Value object LocationCode (Create, Parse, normalization) + tests (BR-31)
 - [x] 2.4c Entity Location (Create, Deactivate, Activate) + tests (BR-18, BR-32..34)
 - [x] 2.4d PR feature/2.4-location → main
+- [x] 2.5a docs/domain.md: κινήσεις αποθέματος (BR-36..44), αναθεώρηση BR-15, BR-28
+- [x] 2.5b Enums MovementType, MovementDirection, AdjustmentReason + extensions + tests (BR-15, BR-36)
+- [x] 2.5c-1 Value object SupplierDocument + tests (BR-39)
+- [ ] 2.5c-2 Entity StockMovement + CreateReceipt (σε εξέλιξη: σκελετός, ευτυχές σενάριο, guard clauses)
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -84,6 +88,12 @@
 | Κατεύθυνση του Reversal | Το `Direction()` πετά `InvalidOperationException` για τον Reversal· η κατεύθυνση υπολογίζεται από την κίνηση, ως αντίθετη της αρχικής | Ο τύπος από μόνος του δεν έχει την πληροφορία (Information Expert) |
 | Πληρότητα κανόνων σε enums | Test με `Enum.GetValues` + `[MemberData]` που αποτυγχάνει όταν μια νέα τιμή δεν έχει κανόνα | Μια ξεχασμένη περίπτωση στο switch πιάνεται στο build και όχι στην παραγωγή |
 | Assert σε exceptions του .NET | Έλεγχος `ParamName` / `ActualValue`, όχι `Message` | Η μορφή του `Message` ορίζεται από το .NET και μπορεί να αλλάξει |
+| Πεδία ανά τύπο κίνησης | Nullable πεδία (π.χ. `SupplierDocument?`) + named factories, όχι κληρονομικότητα | Η factory εγγυάται τα σωστά πεδία ανά τύπο· ένας πίνακας στη βάση. Επανεξέταση αν οι τύποι αποκτήσουν διαφορετική συμπεριφορά |
+| Ποσότητα στις factories κίνησης | Δέχονται `decimal` και φτιάχνουν το `Quantity` με τη μονάδα του υλικού | Οι BR-22, 23, 25 εγγυώνται στο Domain· ο caller δεν μπορεί να περάσει λάθος μονάδα |
+| Τύποι ημερομηνιών κίνησης | `DateOnly` για την ημερομηνία παραστατικού, `DateTimeOffset` (παράμετρος) για την καταχώρηση | Το παραστατικό δεν έχει ώρα· το Domain δεν διαβάζει ρολόι, το offset κρατά την τοπική ώρα |
+| Χρήστης κίνησης | `string RecordedBy`, έλεγχος με `ArgumentException.ThrowIfNullOrWhiteSpace` | Το γεμίζει το σύστημα από το login, άρα κενό σημαίνει bug και όχι λάθος χρήστη. Αλλαγή μετά τη Φάση 6 (JWT) |
+| Αριθμός παραστατικού | `string`, οποιοσδήποτε χαρακτήρας, έως 30, κεφαλαία με `ToUpperInvariant` | Αντιγράφουμε το εξωτερικό έγγραφο (ελληνικές σειρές, μηδενικά μπροστά)· το invariant δίνει ίδιο αποτέλεσμα σε κάθε server |
+| Σειρά ελέγχων σε factories | Πρώτα guard clauses ορισμάτων, μετά κατάσταση, μετά δεδομένα | Δεν ελέγχεται η κατάσταση ενός αντικειμένου που είναι null |
 
 ## Επόμενο βήμα
-Task 2.5 — Κινήσεις αποθέματος (θα οριστεί)
+Task 2.5c-2 (συνέχεια): helper `CreateReceipt` στα tests, έλεγχοι κατάστασης υλικού και θέσης (BR-44), ποσότητα > 0 (BR-02), ημερομηνία παραστατικού (BR-38). Μετά 2.5c-3 `Issue`, 2.5d Adjustment + Transfer, 2.5e Reversal, 2.5f PR.
