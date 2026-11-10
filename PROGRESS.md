@@ -29,6 +29,7 @@
 - [x] 2.5b Enums MovementType, MovementDirection, AdjustmentReason + extensions + tests (BR-15, BR-36)
 - [x] 2.5c-1 Value object SupplierDocument + tests (BR-39)
 - [x] 2.5c-2 Entity StockMovement + CreateReceipt (guards, BR-02, BR-38, BR-39, BR-44) + tests
+- [x] 2.5c-3a StockMovement.CreateIssue + test helper CreateIssue + tests (BR-02, BR-28, BR-38, BR-44)
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -97,6 +98,10 @@
 | Ημερομηνία καταχώρησης για τον BR-38 | `DateOnly.FromDateTime(recordedAt.DateTime)` και όχι `UtcDateTime` | Η ημερομηνία όπως τη ζει ο χρήστης στη ζώνη του· με UTC ένα τιμολόγιο της ίδιας μέρας θα απορριπτόταν μετά τα μεσάνυχτα |
 | Ημερομηνίες σε μηνύματα | Ρητό format `yyyy-MM-dd` | Το default format εξαρτάται από τη γλώσσα του υπολογιστή· τα tests θα έσπαγαν σε άλλο περιβάλλον (CI) |
 | Helper `CreateReceipt` στα tests | Optional parameters με `??` για τα αντικείμενα· τα tests των null guards καλούν απευθείας τη factory | Κάθε test δείχνει μόνο ό,τι αλλάζει· ο helper δεν μπορεί να ξεχωρίσει «δεν δόθηκε» από «δόθηκε null» |
+| Χορήγηση και Issue Request (BR-10, BR-11) | Η `CreateIssue` δεν δέχεται ακόμα Issue Request· ο έλεγχος θα προστεθεί με το aggregate `IssueRequest` | Το aggregate δεν υπάρχει ακόμα (YAGNI)· χωρίς nullable πεδίο «για μελλοντική χρήση» |
+| Αρνητικό απόθεμα (BR-01) στη χορήγηση | Δεν ελέγχεται στη `StockMovement` | Η κίνηση δεν γνωρίζει το υπόλοιπο της θέσης· ο κανόνας ανήκει εκεί όπου υπολογίζεται το απόθεμα |
+| Σειρά υλοποίησης: πρώτα 2ο αντίγραφο, μετά refactoring | Η `CreateIssue` γράφτηκε με tests πριν από την εξαγωγή κοινών ελέγχων | Με δύο αντίγραφα φαίνεται τι είναι πραγματικά κοινό· τα tests αποδεικνύουν ότι το refactoring δεν αλλάζει συμπεριφορά |
 
 ## Επόμενο βήμα
-Task 2.5c-3: (α) refactoring των κοινών ελέγχων της StockMovement σε private methods (θέση, ποσότητα, ημερομηνία), (β) CreateIssue + tests. Μετά 2.5d Adjustment + Transfer, 2.5e Reversal, 2.5f PR.
+Task 2.5c-3b: refactoring κοινών ελέγχων της StockMovement σε private methods (θέση, ποσότητα, ημερομηνία) + απόφαση α/β για τον έλεγχο κατάστασης υλικού (BR-44). Τα tests δεν αλλάζουν.
+Μετά: 2.5d Adjustment + Transfer, 2.5e Reversal, 2.5f PR.
