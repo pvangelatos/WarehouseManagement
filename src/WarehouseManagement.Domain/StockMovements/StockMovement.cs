@@ -1,4 +1,5 @@
-﻿using WarehouseManagement.Domain.Items;
+﻿using WarehouseManagement.Domain.Exceptions;
+using WarehouseManagement.Domain.Items;
 using WarehouseManagement.Domain.Locations;
 
 namespace WarehouseManagement.Domain.StockMovements;
@@ -46,10 +47,13 @@ public sealed class StockMovement
         DateTimeOffset recordedAt,
         string recordedBy)
     {
-        ArgumentNullException.ThrowIfNull(item, nameof(item));
-        ArgumentNullException.ThrowIfNull(location, nameof(location));
-        ArgumentNullException.ThrowIfNull(supplierDocument, nameof(supplierDocument));
-        ArgumentException.ThrowIfNullOrWhiteSpace(recordedBy, nameof(recordedBy));
+        ArgumentNullException.ThrowIfNull(item);
+        ArgumentNullException.ThrowIfNull(location);
+        ArgumentNullException.ThrowIfNull(supplierDocument);
+        ArgumentException.ThrowIfNullOrWhiteSpace(recordedBy);
+
+        if (item.Status is not ItemStatus.Active)
+            throw new BusinessRuleException($"Cannot receive item {item.Sku.Value} with status {item.Status}.");
 
         Quantity quantityValue = Quantity.Create(quantity, item.UnitOfMeasure);
 

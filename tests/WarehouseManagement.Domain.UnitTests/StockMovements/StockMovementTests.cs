@@ -1,4 +1,5 @@
-﻿using WarehouseManagement.Domain.Items;
+﻿using WarehouseManagement.Domain.Exceptions;
+using WarehouseManagement.Domain.Items;
 using WarehouseManagement.Domain.Locations;
 using WarehouseManagement.Domain.StockMovements;
 
@@ -8,6 +9,24 @@ public class StockMovementTests
 {
     private static readonly DateOnly DefaultDocumentDate = new DateOnly(2026, 11, 10);
     private static readonly DateTimeOffset DefaultRecordedAt = new DateTimeOffset(2026, 11, 10, 12, 0, 0, TimeSpan.FromHours(2));
+
+    private static StockMovement CreateReceipt(
+        Item? item = null,
+        Location? location = null,
+        decimal quantity = 5,
+        SupplierDocument? supplierDocument = null,
+        DateOnly? documentDate = null,
+        DateTimeOffset? recordedAt = null,
+        string? recordedBy = null) =>
+        StockMovement.CreateReceipt(
+            item ?? CreateItem(),
+            location ?? CreateLocation(),
+            quantity,
+            supplierDocument ?? SupplierDocument.Create(SupplierDocumentType.Invoice, "INV-001"),
+            documentDate ?? DefaultDocumentDate,
+            recordedAt ?? DefaultRecordedAt,
+            recordedBy ?? "test user");
+
     private static Item CreateItem(
        string sku = "VALID-SKU",
        string name = "Valid Item Name",
@@ -160,5 +179,34 @@ public class StockMovementTests
 
         // Assert
         Assert.Equal("recordedBy", exception.ParamName);
+    }
+
+    [Fact]
+    public void CreateReceipt_DiscontinuedItem_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        var item = CreateItem();
+        item.Discontinue();
+
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateReceipt(item: item));
+
+        // Assert
+        Assert.Equal("Cannot receive item VALID-SKU with status Discontinued.", exception.Message);
+    }
+
+    [Fact]
+    public void CreateReceipt_InactiveItem_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        var item = CreateItem();
+        item.Discontinue();
+        item.Deactivate(Quantity.Zero);
+
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateReceipt(item: item));
+
+        // Assert
+        Assert.Equal("Cannot receive item VALID-SKU with status Inactive.", exception.Message);
     }
 }
