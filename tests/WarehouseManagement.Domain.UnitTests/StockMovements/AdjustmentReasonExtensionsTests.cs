@@ -4,7 +4,7 @@ namespace WarehouseManagement.Domain.UnitTests.StockMovements;
 
 public class AdjustmentReasonExtensionsTests
 {
-    public static TheoryData<AdjustmentReason> AllAdjustmentReasons() => new(Enum.GetValues<AdjustmentReason>());
+    public static TheoryData<AdjustmentReason> AllAdjustmentReasons => new(Enum.GetValues<AdjustmentReason>());
 
     [Theory]
     [InlineData(AdjustmentReason.Damage, MovementType.AdjustmentDecrease, true)]
