@@ -80,4 +80,45 @@ public sealed class StockMovement
             recordedBy,
             supplierDocument);
     }
+
+    public static StockMovement CreateIssue(
+        Item item,
+        Location location,
+        decimal quantity,
+        DateOnly documentDate,
+        DateTimeOffset recordedAt,
+        string recordedBy)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        ArgumentNullException.ThrowIfNull(location);
+        ArgumentException.ThrowIfNullOrWhiteSpace(recordedBy);
+
+        if (item.Status is not (ItemStatus.Active or ItemStatus.Discontinued))
+            throw new BusinessRuleException($"Cannot issue item {item.Sku.Value} with status {item.Status}.");
+
+        if (location.Status is not LocationStatus.Active)
+            throw new BusinessRuleException($"Cannot issue stock from location {location.Code} with status {location.Status}.");
+
+        Quantity quantityValue = Quantity.Create(quantity, item.UnitOfMeasure);
+
+        if (quantityValue.Value <= 0)
+            throw new BusinessRuleException("Quantity must be greater than zero.");
+
+        DateOnly recordedDate = DateOnly.FromDateTime(recordedAt.DateTime);
+
+        if (documentDate > recordedDate)
+            throw new BusinessRuleException(
+                $"Document date {documentDate:yyyy-MM-dd} cannot be after recording date {recordedDate:yyyy-MM-dd}.");
+
+        return new StockMovement(
+            Guid.CreateVersion7(),
+            item.Id,
+            location.Id,
+            MovementType.Issue,
+            quantityValue,
+            documentDate,
+            recordedAt,
+            recordedBy,
+            null);
+    }
 }

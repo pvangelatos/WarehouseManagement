@@ -27,6 +27,21 @@ public class StockMovementTests
             recordedAt ?? DefaultRecordedAt,
             recordedBy ?? "test user");
 
+    private static StockMovement CreateIssue(
+        Item? item = null,
+        Location? location = null,
+        decimal quantity = 5,
+        DateOnly? documentDate = null,
+        DateTimeOffset? recordedAt = null,
+        string? recordedBy = null) =>
+        StockMovement.CreateIssue(
+            item ?? CreateItem(),
+            location ?? CreateLocation(),
+            quantity,
+            documentDate ?? DefaultDocumentDate,
+            recordedAt ?? DefaultRecordedAt,
+            recordedBy ?? "test user");
+
     private static Item CreateItem(
        string sku = "VALID-SKU",
        string name = "Valid Item Name",
@@ -89,13 +104,13 @@ public class StockMovementTests
 
         // Act 
         var exception = Assert.Throws<ArgumentNullException>(() => StockMovement.CreateReceipt(
-            item!,
-            location,
-            quantity,
-            supplierDocument,
-            documentDate,
-            recordedAt,
-            recordedBy));
+        item!,
+        location,
+        quantity,
+        supplierDocument,
+        documentDate,
+        recordedAt,
+        recordedBy));
 
         // Assert
         Assert.Equal("item", exception.ParamName);
@@ -323,5 +338,194 @@ public class StockMovementTests
         // Assert
         Assert.Equal(documentDate, stockMovement.DocumentDate);
         Assert.Equal(recordedAt, stockMovement.RecordedAt);
+    }
+
+    [Fact]
+    public void CreateIssue_DiscontinuedItem_ReturnsIssue()
+    {
+        // Arrange
+        var item = CreateItem();
+        item.Discontinue();
+
+        // Act
+        StockMovement stockMovement = CreateIssue(item: item);
+
+        // Assert
+        Assert.Equal(MovementType.Issue, stockMovement.Type);
+        Assert.Equal(item.Id, stockMovement.ItemId);
+    }
+
+    [Fact]
+    public void CreateIssue_InactiveItem_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        var item = CreateItem();
+        item.Discontinue();
+        item.Deactivate(Quantity.Zero);
+
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateIssue(item: item));
+
+        // Assert
+        Assert.Equal("Cannot issue item VALID-SKU with status Inactive.", exception.Message);
+    }
+
+    [Fact]
+    public void CreateIssue_ValidInput_ReturnsIssueWithAllData()
+    {
+        // Arrange
+        var item = CreateItem();
+        var location = CreateLocation();
+        decimal quantity = 5;
+        var documentDate = DefaultDocumentDate;
+        var recordedAt = DefaultRecordedAt;
+        string recordedBy = "test_user";
+
+        // Act
+        var stockMovement = StockMovement.CreateIssue(
+            item,
+            location,
+            quantity,
+            documentDate,
+            recordedAt,
+            recordedBy);
+
+        // Assert
+        Assert.NotEqual(Guid.Empty, stockMovement.Id);
+        Assert.Equal(item.Id, stockMovement.ItemId);
+        Assert.Equal(location.Id, stockMovement.LocationId);
+        Assert.Equal(MovementType.Issue, stockMovement.Type);
+        Assert.Equal(quantity, stockMovement.Quantity.Value);
+        Assert.Equal(documentDate, stockMovement.DocumentDate);
+        Assert.Equal(recordedAt, stockMovement.RecordedAt);
+        Assert.Equal(recordedBy, stockMovement.RecordedBy);
+        Assert.Null(stockMovement.SupplierDocument);
+    }
+
+    [Fact]
+    public void CreateIssue_InactiveLocation_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        var location = CreateLocation();
+        location.Deactivate(isEmpty: true);
+
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateIssue(location: location));
+
+        // Assert
+        Assert.Equal($"Cannot issue stock from location 001-01-00 with status Inactive.", exception.Message);
+    }
+
+    [Fact]
+    public void CreateIssue_ZeroQuantity_ThrowsBusinessRuleException()
+    {
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateIssue(quantity: 0));
+
+        // Assert
+        Assert.Equal("Quantity must be greater than zero.", exception.Message);
+    }
+
+    [Fact]
+    public void CreateIssue_DecimalQuantityForWholeUnit_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        decimal quantity = 1.5m;
+
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateIssue(quantity: quantity));
+
+        // Assert
+        Assert.Equal("Quantity for Box cannot have more than 0 decimal places.", exception.Message);
+    }
+
+    [Fact]
+    public void CreateIssue_DocumentDateAfterRecordingDate_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        var documentDate = new DateOnly(2026, 11, 11);
+        var recordedAt = new DateTimeOffset(2026, 11, 10, 12, 0, 0, TimeSpan.FromHours(2));
+
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateIssue(
+            documentDate: documentDate,
+            recordedAt: recordedAt));
+
+        // Assert
+        Assert.Equal("Document date 2026-11-11 cannot be after recording date 2026-11-10.", exception.Message);
+    }
+
+    [Fact]
+    public void CreateIssue_NullItem_ThrowsArgumentNullException()
+    {
+        // Arrange
+        Item? item = null;
+        var location = CreateLocation();
+        decimal quantity = 5;
+        var documentDate = DefaultDocumentDate;
+        var recordedAt = DefaultRecordedAt;
+        string recordedBy = "test_user";
+
+        // Act 
+        var exception = Assert.Throws<ArgumentNullException>(() => StockMovement.CreateIssue(
+        item!,
+        location,
+        quantity,
+        documentDate,
+        recordedAt,
+        recordedBy));
+
+        // Assert
+        Assert.Equal("item", exception.ParamName);
+    }
+
+    [Fact]
+    public void CreateIssue_NullLocation_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var item = CreateItem();
+        Location? location = null;
+        decimal quantity = 5;
+        var documentDate = DefaultDocumentDate;
+        var recordedAt = DefaultRecordedAt;
+        string recordedBy = "test_user";
+
+        // Act
+        var exception = Assert.Throws<ArgumentNullException>(() => StockMovement.CreateIssue(
+            item,
+            location!,
+            quantity,
+            documentDate,
+            recordedAt,
+            recordedBy));
+
+        // Assert
+        Assert.Equal("location", exception.ParamName);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void CreateIssue_MissingRecordedBy_ThrowsArgumentException(string? recordedBy)
+    {
+        // Arrange
+        var item = CreateItem();
+        var location = CreateLocation();
+        decimal quantity = 5;
+        var documentDate = DefaultDocumentDate;
+        var recordedAt = DefaultRecordedAt;
+
+        // Act
+        var exception = Assert.ThrowsAny<ArgumentException>(() => StockMovement.CreateIssue(
+            item,
+            location,
+            quantity,
+            documentDate,
+            recordedAt,
+            recordedBy!));
+
+        // Assert
+        Assert.Equal("recordedBy", exception.ParamName);
     }
 }
