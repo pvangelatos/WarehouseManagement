@@ -261,4 +261,67 @@ public class StockMovementTests
         // Assert
         Assert.Equal("Cannot receive item VALID-SKU with status Discontinued.", exception.Message);
     }
+
+    [Fact]
+    public void CreateReceipt_DocumentDateAfterRecordingDate_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        var documentDate = new DateOnly(2026, 11, 11);
+        var recordedAt = new DateTimeOffset(2026, 11, 10, 12, 0, 0, TimeSpan.FromHours(2));
+
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateReceipt(
+            documentDate: documentDate,
+            recordedAt: recordedAt));
+
+        // Assert
+        Assert.Equal("Document date 2026-11-11 cannot be after recording date 2026-11-10.", exception.Message);
+    }
+
+    [Fact]
+    public void CreateReceipt_DocumentDateSameAsRecordingDate_ReturnsStockMovement()
+    {
+        // Arrange
+        var documentDate = new DateOnly(2026, 11, 10);
+        var recordedAt = new DateTimeOffset(2026, 11, 10, 23, 59, 0, TimeSpan.FromHours(2));
+
+        // Act
+        var stockMovement = CreateReceipt(
+            documentDate: documentDate,
+            recordedAt: recordedAt);
+
+        // Assert
+        Assert.Equal(documentDate, stockMovement.DocumentDate);
+        Assert.Equal(recordedAt, stockMovement.RecordedAt);
+    }
+
+    [Fact]
+    public void CreateReceipt_DocumentDateFarInPast_ReturnsStockMovement()
+    {
+        // Arrange
+        var documentDate = new DateOnly(1990, 1, 1);
+
+        // Act
+        var stockMovement = CreateReceipt(documentDate: documentDate);
+
+        // Assert
+        Assert.Equal(documentDate, stockMovement.DocumentDate);
+    }
+
+    [Fact]
+    public void CreateReceipt_RecordedAfterMidnightLocalTime_ReturnsStockMovement()
+    {
+        // Arrange
+        var recordedAt = new DateTimeOffset(2026, 11, 11, 0, 30, 0, TimeSpan.FromHours(2));
+        var documentDate = new DateOnly(2026, 11, 11);
+
+        // Act
+        var stockMovement = CreateReceipt(
+            documentDate: documentDate,
+            recordedAt: recordedAt);
+
+        // Assert
+        Assert.Equal(documentDate, stockMovement.DocumentDate);
+        Assert.Equal(recordedAt, stockMovement.RecordedAt);
+    }
 }

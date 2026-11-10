@@ -63,6 +63,12 @@ public sealed class StockMovement
         if (quantityValue.Value <= 0)
             throw new BusinessRuleException("Quantity must be greater than zero.");
 
+        DateOnly recordedDate = DateOnly.FromDateTime(recordedAt.DateTime);
+
+        if (documentDate > recordedDate)
+            throw new BusinessRuleException(
+                $"Document date {documentDate:yyyy-MM-dd} cannot be after recording date {recordedDate:yyyy-MM-dd}.");
+
         return new StockMovement(
             Guid.CreateVersion7(),
             item.Id,
