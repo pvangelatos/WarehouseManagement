@@ -28,7 +28,7 @@
 - [x] 2.5a docs/domain.md: κινήσεις αποθέματος (BR-36..44), αναθεώρηση BR-15, BR-28
 - [x] 2.5b Enums MovementType, MovementDirection, AdjustmentReason + extensions + tests (BR-15, BR-36)
 - [x] 2.5c-1 Value object SupplierDocument + tests (BR-39)
-- [ ] 2.5c-2 Entity StockMovement + CreateReceipt (σε εξέλιξη: σκελετός, ευτυχές σενάριο, guard clauses)
+- [x] 2.5c-2 Entity StockMovement + CreateReceipt (guards, BR-02, BR-38, BR-39, BR-44) + tests
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -94,6 +94,9 @@
 | Χρήστης κίνησης | `string RecordedBy`, έλεγχος με `ArgumentException.ThrowIfNullOrWhiteSpace` | Το γεμίζει το σύστημα από το login, άρα κενό σημαίνει bug και όχι λάθος χρήστη. Αλλαγή μετά τη Φάση 6 (JWT) |
 | Αριθμός παραστατικού | `string`, οποιοσδήποτε χαρακτήρας, έως 30, κεφαλαία με `ToUpperInvariant` | Αντιγράφουμε το εξωτερικό έγγραφο (ελληνικές σειρές, μηδενικά μπροστά)· το invariant δίνει ίδιο αποτέλεσμα σε κάθε server |
 | Σειρά ελέγχων σε factories | Πρώτα guard clauses ορισμάτων, μετά κατάσταση, μετά δεδομένα | Δεν ελέγχεται η κατάσταση ενός αντικειμένου που είναι null |
+| Ημερομηνία καταχώρησης για τον BR-38 | `DateOnly.FromDateTime(recordedAt.DateTime)` και όχι `UtcDateTime` | Η ημερομηνία όπως τη ζει ο χρήστης στη ζώνη του· με UTC ένα τιμολόγιο της ίδιας μέρας θα απορριπτόταν μετά τα μεσάνυχτα |
+| Ημερομηνίες σε μηνύματα | Ρητό format `yyyy-MM-dd` | Το default format εξαρτάται από τη γλώσσα του υπολογιστή· τα tests θα έσπαγαν σε άλλο περιβάλλον (CI) |
+| Helper `CreateReceipt` στα tests | Optional parameters με `??` για τα αντικείμενα· τα tests των null guards καλούν απευθείας τη factory | Κάθε test δείχνει μόνο ό,τι αλλάζει· ο helper δεν μπορεί να ξεχωρίσει «δεν δόθηκε» από «δόθηκε null» |
 
 ## Επόμενο βήμα
-Task 2.5c-2 (συνέχεια): helper `CreateReceipt` στα tests, έλεγχοι κατάστασης υλικού και θέσης (BR-44), ποσότητα > 0 (BR-02), ημερομηνία παραστατικού (BR-38). Μετά 2.5c-3 `Issue`, 2.5d Adjustment + Transfer, 2.5e Reversal, 2.5f PR.
+Task 2.5c-3: (α) refactoring των κοινών ελέγχων της StockMovement σε private methods (θέση, ποσότητα, ημερομηνία), (β) CreateIssue + tests. Μετά 2.5d Adjustment + Transfer, 2.5e Reversal, 2.5f PR.
