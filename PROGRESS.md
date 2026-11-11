@@ -30,6 +30,7 @@
 - [x] 2.5c-1 Value object SupplierDocument + tests (BR-39)
 - [x] 2.5c-2 Entity StockMovement + CreateReceipt (guards, BR-02, BR-38, BR-39, BR-44) + tests
 - [x] 2.5c-3a StockMovement.CreateIssue + test helper CreateIssue + tests (BR-02, BR-28, BR-38, BR-44)
+- [x] 2.5c-3b Refactoring κοινών ελέγχων StockMovement + MovementType.IsAllowedFor (BR-44) + test σειράς ελέγχων στη CreateIssue
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -101,7 +102,13 @@
 | Χορήγηση και Issue Request (BR-10, BR-11) | Η `CreateIssue` δεν δέχεται ακόμα Issue Request· ο έλεγχος θα προστεθεί με το aggregate `IssueRequest` | Το aggregate δεν υπάρχει ακόμα (YAGNI)· χωρίς nullable πεδίο «για μελλοντική χρήση» |
 | Αρνητικό απόθεμα (BR-01) στη χορήγηση | Δεν ελέγχεται στη `StockMovement` | Η κίνηση δεν γνωρίζει το υπόλοιπο της θέσης· ο κανόνας ανήκει εκεί όπου υπολογίζεται το απόθεμα |
 | Σειρά υλοποίησης: πρώτα 2ο αντίγραφο, μετά refactoring | Η `CreateIssue` γράφτηκε με tests πριν από την εξαγωγή κοινών ελέγχων | Με δύο αντίγραφα φαίνεται τι είναι πραγματικά κοινό· τα tests αποδεικνύουν ότι το refactoring δεν αλλάζει συμπεριφορά |
+| Έλεγχος κατάστασης υλικού (BR-44) | Extension `MovementType.IsAllowedFor(ItemStatus)` στο `MovementTypeExtensions`· η `StockMovement` πετά το exception | Ο πίνακας του BR-44 σε ένα σημείο με 25 tests· οι επόμενοι τύποι δεν ξαναγράφουν τον κανόνα. Στο `StockMovements`, ώστε το `Items` να μην εξαρτάται από τις κινήσεις |
+| Κοινοί έλεγχοι κινήσεων | `private static` methods στη `StockMovement` (`Validate…` όταν μόνο ελέγχουν, `Create…` όταν επιστρέφουν έγκυρο αντικείμενο), με τη σειρά που καλούνται | Ένας κανόνας αλλάζει σε ένα σημείο· οι factories διαβάζονται σαν λίστα ελέγχων |
+| Μηνύματα κοινών ελέγχων | Χωρίς ρήμα συγκεκριμένης κίνησης· κωδικός, κατάσταση και τύπος από τα αντικείμενα | Ισχύουν για κάθε τύπο κίνησης· στη μεταφορά ο κωδικός δείχνει ποια θέση φταίει |
+| Expected σε tests μηνυμάτων | Σταθερό κείμενο, όχι interpolation | Με interpolation το test επαναλαμβάνει τον κώδικα και δεν πιάνει λάθη (π.χ. χαμένο `ToString`) |
+| Test σειράς ελέγχων | Ένα ανά factory | Η σειρά των κλήσεων είναι γραμμένη σε κάθε factory χωριστά |
+| Refactoring με αλλαγή μηνυμάτων | Χωριστό commit για τη δομή (tests ανέγγιχτα) και για την αλλαγή μηνυμάτων | Ο reviewer ξεχωρίζει αμέσως τι είναι δομή και τι συμπεριφορά |
 
 ## Επόμενο βήμα
-Task 2.5c-3b: refactoring κοινών ελέγχων της StockMovement σε private methods (θέση, ποσότητα, ημερομηνία) + απόφαση α/β για τον έλεγχο κατάστασης υλικού (BR-44). Τα tests δεν αλλάζουν.
-Μετά: 2.5d Adjustment + Transfer, 2.5e Reversal, 2.5f PR.
+Task 2.5d: Adjustment (Increase/Decrease με αιτιολογία, BR-15, BR-41) + Transfer (Out/In με κοινό αναγνωριστικό, BR-40).
+Μετά: 2.5e Reversal, 2.5f PR.
