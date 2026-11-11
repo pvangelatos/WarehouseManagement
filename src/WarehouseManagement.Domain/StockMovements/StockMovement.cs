@@ -58,16 +58,9 @@ public sealed class StockMovement
         if (location.Status is not LocationStatus.Active)
             throw new BusinessRuleException($"Cannot receive stock to location {location.Code} with status {location.Status}.");
 
-        Quantity quantityValue = Quantity.Create(quantity, item.UnitOfMeasure);
+        Quantity quantityValue = CreatePositiveQuantity(quantity, item.UnitOfMeasure);
 
-        if (quantityValue.Value <= 0)
-            throw new BusinessRuleException("Quantity must be greater than zero.");
-
-        DateOnly recordedDate = DateOnly.FromDateTime(recordedAt.DateTime);
-
-        if (documentDate > recordedDate)
-            throw new BusinessRuleException(
-                $"Document date {documentDate:yyyy-MM-dd} cannot be after recording date {recordedDate:yyyy-MM-dd}.");
+        ValidateDocumentDate(documentDate, recordedAt);
 
         return new StockMovement(
             Guid.CreateVersion7(),
@@ -99,16 +92,9 @@ public sealed class StockMovement
         if (location.Status is not LocationStatus.Active)
             throw new BusinessRuleException($"Cannot issue stock from location {location.Code} with status {location.Status}.");
 
-        Quantity quantityValue = Quantity.Create(quantity, item.UnitOfMeasure);
+        Quantity quantityValue = CreatePositiveQuantity(quantity, item.UnitOfMeasure);
 
-        if (quantityValue.Value <= 0)
-            throw new BusinessRuleException("Quantity must be greater than zero.");
-
-        DateOnly recordedDate = DateOnly.FromDateTime(recordedAt.DateTime);
-
-        if (documentDate > recordedDate)
-            throw new BusinessRuleException(
-                $"Document date {documentDate:yyyy-MM-dd} cannot be after recording date {recordedDate:yyyy-MM-dd}.");
+        ValidateDocumentDate(documentDate, recordedAt);
 
         return new StockMovement(
             Guid.CreateVersion7(),
@@ -120,5 +106,23 @@ public sealed class StockMovement
             recordedAt,
             recordedBy,
             null);
+    }
+
+    private static Quantity CreatePositiveQuantity(decimal quantity, UnitOfMeasure unitOfMeasure)
+    {
+        Quantity quantityValue = Quantity.Create(quantity, unitOfMeasure);
+
+        if (quantityValue.Value <= 0)
+            throw new BusinessRuleException("Quantity must be greater than zero.");
+
+        return quantityValue;
+    }
+
+    private static void ValidateDocumentDate(DateOnly documentDate, DateTimeOffset recordedAt)
+    {
+        DateOnly recordedDate = DateOnly.FromDateTime(recordedAt.DateTime);
+        if (documentDate > recordedDate)
+            throw new BusinessRuleException(
+                $"Document date {documentDate:yyyy-MM-dd} cannot be after recording date {recordedDate:yyyy-MM-dd}.");
     }
 }
