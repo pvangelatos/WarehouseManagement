@@ -104,6 +104,18 @@ public sealed class StockMovement
             null);
     }
 
+    private static void ValidateItemStatus(Item item, MovementType movementType)
+    {
+        if (!movementType.IsAllowedFor(item.Status))
+            throw new BusinessRuleException($"Movement type {movementType} is not allowed for item {item.Sku.Value} with status {item.Status}.");
+    }
+
+    private static void ValidateLocationStatus(Location location)
+    {
+        if (location.Status is not LocationStatus.Active)
+            throw new BusinessRuleException($"Location {location.Code} with status {location.Status} does not allow stock movements.");
+    }
+
     private static Quantity CreatePositiveQuantity(decimal quantity, UnitOfMeasure unitOfMeasure)
     {
         Quantity quantityValue = Quantity.Create(quantity, unitOfMeasure);
@@ -121,17 +133,5 @@ public sealed class StockMovement
         if (documentDate > recordedDate)
             throw new BusinessRuleException(
                 $"Document date {documentDate:yyyy-MM-dd} cannot be after recording date {recordedDate:yyyy-MM-dd}.");
-    }
-
-    private static void ValidateLocationStatus(Location location)
-    {
-        if (location.Status is not LocationStatus.Active)
-            throw new BusinessRuleException($"Location {location.Code} with status {location.Status} does not allow stock movements.");
-    }
-
-    private static void ValidateItemStatus(Item item, MovementType movementType)
-    {
-        if (!movementType.IsAllowedFor(item.Status))
-            throw new BusinessRuleException($"Movement type {movementType} is not allowed for item {item.Sku.Value} with status {item.Status}.");
     }
 }

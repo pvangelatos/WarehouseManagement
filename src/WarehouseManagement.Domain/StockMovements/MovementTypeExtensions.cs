@@ -22,7 +22,7 @@ public static class MovementTypeExtensions
             ItemStatus.Active => true,
             ItemStatus.Discontinued => movementType != MovementType.Receipt,
             ItemStatus.Inactive => false,
-            _ => throw new ArgumentOutOfRangeException(nameof(itemStatus), itemStatus, $"Unknown item status: {itemStatus}.")
+            _ => throw new ArgumentOutOfRangeException(nameof(itemStatus), itemStatus, $"Unknown item status: {itemStatus}."),
         };
     }
 }
