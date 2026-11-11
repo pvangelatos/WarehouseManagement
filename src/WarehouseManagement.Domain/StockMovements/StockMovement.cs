@@ -52,11 +52,9 @@ public sealed class StockMovement
         ArgumentNullException.ThrowIfNull(supplierDocument);
         ArgumentException.ThrowIfNullOrWhiteSpace(recordedBy);
 
-        if (item.Status is not ItemStatus.Active)
-            throw new BusinessRuleException($"Cannot receive item {item.Sku.Value} with status {item.Status}.");
+        ValidateItemStatus(item, MovementType.Receipt);
 
-        if (location.Status is not LocationStatus.Active)
-            throw new BusinessRuleException($"Cannot receive stock to location {location.Code} with status {location.Status}.");
+        ValidateLocationStatus(location);
 
         Quantity quantityValue = CreatePositiveQuantity(quantity, item.UnitOfMeasure);
 
@@ -86,11 +84,9 @@ public sealed class StockMovement
         ArgumentNullException.ThrowIfNull(location);
         ArgumentException.ThrowIfNullOrWhiteSpace(recordedBy);
 
-        if (item.Status is not (ItemStatus.Active or ItemStatus.Discontinued))
-            throw new BusinessRuleException($"Cannot issue item {item.Sku.Value} with status {item.Status}.");
+        ValidateItemStatus(item, MovementType.Issue);
 
-        if (location.Status is not LocationStatus.Active)
-            throw new BusinessRuleException($"Cannot issue stock from location {location.Code} with status {location.Status}.");
+        ValidateLocationStatus(location);
 
         Quantity quantityValue = CreatePositiveQuantity(quantity, item.UnitOfMeasure);
 
@@ -121,8 +117,21 @@ public sealed class StockMovement
     private static void ValidateDocumentDate(DateOnly documentDate, DateTimeOffset recordedAt)
     {
         DateOnly recordedDate = DateOnly.FromDateTime(recordedAt.DateTime);
+
         if (documentDate > recordedDate)
             throw new BusinessRuleException(
                 $"Document date {documentDate:yyyy-MM-dd} cannot be after recording date {recordedDate:yyyy-MM-dd}.");
+    }
+
+    private static void ValidateLocationStatus(Location location)
+    {
+        if (location.Status is not LocationStatus.Active)
+            throw new BusinessRuleException($"Location {location.Code} with status {location.Status} does not allow stock movements.");
+    }
+
+    private static void ValidateItemStatus(Item item, MovementType movementType)
+    {
+        if (!movementType.IsAllowedFor(item.Status))
+            throw new BusinessRuleException($"Movement type {movementType} is not allowed for item {item.Sku.Value} with status {item.Status}.");
     }
 }

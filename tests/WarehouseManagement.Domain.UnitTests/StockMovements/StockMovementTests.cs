@@ -207,7 +207,7 @@ public class StockMovementTests
         var exception = Assert.Throws<BusinessRuleException>(() => CreateReceipt(item: item));
 
         // Assert
-        Assert.Equal("Cannot receive item VALID-SKU with status Discontinued.", exception.Message);
+        Assert.Equal("Movement type Receipt is not allowed for item VALID-SKU with status Discontinued.", exception.Message);
     }
 
     [Fact]
@@ -222,7 +222,7 @@ public class StockMovementTests
         var exception = Assert.Throws<BusinessRuleException>(() => CreateReceipt(item: item));
 
         // Assert
-        Assert.Equal("Cannot receive item VALID-SKU with status Inactive.", exception.Message);
+        Assert.Equal("Movement type Receipt is not allowed for item VALID-SKU with status Inactive.", exception.Message);
     }
 
     [Fact]
@@ -236,7 +236,7 @@ public class StockMovementTests
         var exception = Assert.Throws<BusinessRuleException>(() => CreateReceipt(location: location));
 
         // Assert
-        Assert.Equal($"Cannot receive stock to location 001-01-00 with status Inactive.", exception.Message);
+        Assert.Equal("Location 001-01-00 with status Inactive does not allow stock movements.", exception.Message);
     }
 
     [Fact]
@@ -274,7 +274,7 @@ public class StockMovementTests
         var exception = Assert.Throws<BusinessRuleException>(() => CreateReceipt(item: item, quantity: 0));
 
         // Assert
-        Assert.Equal("Cannot receive item VALID-SKU with status Discontinued.", exception.Message);
+        Assert.Equal("Movement type Receipt is not allowed for item VALID-SKU with status Discontinued.", exception.Message);
     }
 
     [Fact]
@@ -367,7 +367,7 @@ public class StockMovementTests
         var exception = Assert.Throws<BusinessRuleException>(() => CreateIssue(item: item));
 
         // Assert
-        Assert.Equal("Cannot issue item VALID-SKU with status Inactive.", exception.Message);
+        Assert.Equal("Movement type Issue is not allowed for item VALID-SKU with status Inactive.", exception.Message);
     }
 
     [Fact]
@@ -413,7 +413,7 @@ public class StockMovementTests
         var exception = Assert.Throws<BusinessRuleException>(() => CreateIssue(location: location));
 
         // Assert
-        Assert.Equal($"Cannot issue stock from location 001-01-00 with status Inactive.", exception.Message);
+        Assert.Equal("Location 001-01-00 with status Inactive does not allow stock movements.", exception.Message);
     }
 
     [Fact]
