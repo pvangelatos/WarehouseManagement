@@ -528,4 +528,19 @@ public class StockMovementTests
         // Assert
         Assert.Equal("recordedBy", exception.ParamName);
     }
+
+    [Fact]
+    public void CreateIssue_InactiveItemAndZeroQuantity_ThrowsItemStatusErrorFirst()
+    {
+        // Arrange
+        var item = CreateItem();
+        item.Discontinue();
+        item.Deactivate(Quantity.Zero);
+
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateIssue(item: item, quantity: 0));
+
+        // Assert
+        Assert.Equal("Movement type Issue is not allowed for item VALID-SKU with status Inactive.", exception.Message);
+    }
 }
