@@ -15,6 +15,7 @@ public sealed class StockMovement
     public DateTimeOffset RecordedAt { get; }
     public string RecordedBy { get; }
     public SupplierDocument? SupplierDocument { get; }
+    public AdjustmentReason? AdjustmentReason { get; }
 
     private StockMovement(
         Guid id,
@@ -25,7 +26,8 @@ public sealed class StockMovement
         DateOnly documentDate,
         DateTimeOffset recordedAt,
         string recordedBy,
-        SupplierDocument? supplierDocument)
+        SupplierDocument? supplierDocument,
+        AdjustmentReason? adjustmentReason)
     {
         Id = id;
         ItemId = itemId;
@@ -36,6 +38,7 @@ public sealed class StockMovement
         RecordedAt = recordedAt;
         RecordedBy = recordedBy;
         SupplierDocument = supplierDocument;
+        AdjustmentReason = adjustmentReason;
     }
 
     public static StockMovement CreateReceipt(
@@ -69,7 +72,8 @@ public sealed class StockMovement
             documentDate,
             recordedAt,
             recordedBy,
-            supplierDocument);
+            supplierDocument,
+            adjustmentReason: null);
     }
 
     public static StockMovement CreateIssue(
@@ -101,7 +105,48 @@ public sealed class StockMovement
             documentDate,
             recordedAt,
             recordedBy,
-            null);
+            supplierDocument: null,
+            adjustmentReason: null);
+    }
+
+    public static StockMovement CreateAdjustment(
+        Item item,
+        Location location,
+        MovementType type,
+        AdjustmentReason adjustmentReason,
+        decimal quantity,
+        DateOnly documentDate,
+        DateTimeOffset recordedAt,
+        string recordedBy)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        ArgumentNullException.ThrowIfNull(location);
+        ArgumentException.ThrowIfNullOrWhiteSpace(recordedBy);
+
+        if (type is not (MovementType.AdjustmentIncrease or MovementType.AdjustmentDecrease))
+            throw new ArgumentException($"Movement type must be AdjustmentIncrease or AdjustmentDecrease. Provided: {type}", nameof(type));
+
+        ValidateItemStatus(item, type);
+
+        ValidateLocationStatus(location);
+
+        Quantity quantityValue = CreatePositiveQuantity(quantity, item.UnitOfMeasure);
+
+        ValidateAdjustmentReason(adjustmentReason, type);
+
+        ValidateDocumentDate(documentDate, recordedAt);
+
+        return new StockMovement(
+            Guid.CreateVersion7(),
+            item.Id,
+            location.Id,
+            type,
+            quantityValue,
+            documentDate,
+            recordedAt,
+            recordedBy,
+            supplierDocument: null,
+            adjustmentReason: adjustmentReason);
     }
 
     private static void ValidateItemStatus(Item item, MovementType movementType)
@@ -124,6 +169,12 @@ public sealed class StockMovement
             throw new BusinessRuleException("Quantity must be greater than zero.");
 
         return quantityValue;
+    }
+
+    private static void ValidateAdjustmentReason(AdjustmentReason adjustmentReason, MovementType movementType)
+    {
+        if (!adjustmentReason.IsAllowedForAdjustment(movementType))
+            throw new BusinessRuleException($"Adjustment reason {adjustmentReason} is not allowed for movement type {movementType}.");
     }
 
     private static void ValidateDocumentDate(DateOnly documentDate, DateTimeOffset recordedAt)

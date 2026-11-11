@@ -42,6 +42,25 @@ public class StockMovementTests
             recordedAt ?? DefaultRecordedAt,
             recordedBy ?? "test user");
 
+    private static StockMovement CreateAdjustment(
+        Item? item = null,
+        Location? location = null,
+        MovementType type = MovementType.AdjustmentIncrease,
+        AdjustmentReason reason = AdjustmentReason.CountingError,
+        decimal quantity = 5,
+        DateOnly? documentDate = null,
+        DateTimeOffset? recordedAt = null,
+        string? recordedBy = null) =>
+        StockMovement.CreateAdjustment(
+            item ?? CreateItem(),
+            location ?? CreateLocation(),
+            type,
+            reason,
+            quantity,
+            documentDate ?? DefaultDocumentDate,
+            recordedAt ?? DefaultRecordedAt,
+            recordedBy ?? "test user");
+
     private static Item CreateItem(
        string sku = "VALID-SKU",
        string name = "Valid Item Name",
@@ -542,5 +561,42 @@ public class StockMovementTests
 
         // Assert
         Assert.Equal("Movement type Issue is not allowed for item VALID-SKU with status Inactive.", exception.Message);
+    }
+
+    [Fact]
+    public void CreateAdjustment_ValidInput_ReturnsAdjustmentWithAllData()
+    {
+        // Arrange
+        var item = CreateItem();
+        var location = CreateLocation();
+        var type = MovementType.AdjustmentIncrease;
+        var reason = AdjustmentReason.CountingError;
+        decimal quantity = 5;
+        var documentDate = DefaultDocumentDate;
+        var recordedAt = DefaultRecordedAt;
+        string recordedBy = "test_user";
+
+        // Act
+        var stockMovement = StockMovement.CreateAdjustment(
+            item,
+            location,
+            type,
+            reason,
+            quantity,
+            documentDate,
+            recordedAt,
+            recordedBy);
+
+        // Assert
+        Assert.NotEqual(Guid.Empty, stockMovement.Id);
+        Assert.Equal(item.Id, stockMovement.ItemId);
+        Assert.Equal(location.Id, stockMovement.LocationId);
+        Assert.Equal(type, stockMovement.Type);
+        Assert.Equal(reason, stockMovement.AdjustmentReason);
+        Assert.Equal(quantity, stockMovement.Quantity.Value);
+        Assert.Equal(documentDate, stockMovement.DocumentDate);
+        Assert.Equal(recordedAt, stockMovement.RecordedAt);
+        Assert.Equal(recordedBy, stockMovement.RecordedBy);
+        Assert.Null(stockMovement.SupplierDocument);
     }
 }
