@@ -684,5 +684,46 @@ public class StockMovementTests
         Assert.Equal("recordedBy", exception.ParamName);
     }
 
+    [Theory]
+    [InlineData(MovementType.Receipt)]
+    [InlineData(MovementType.Issue)]
+    [InlineData(MovementType.TransferIn)]
+    [InlineData(MovementType.TransferOut)]
+    [InlineData(MovementType.Reversal)]
+    public void CreateAdjustment_InvalidMovementType_ThrowsArgumentException(MovementType movementType)
+    {
+        // Act
+        var exception = Assert.Throws<ArgumentException>(() => CreateAdjustment(type: movementType));
 
+        // Assert
+        Assert.Equal("type", exception.ParamName);
+    }
+
+    [Theory]
+    [InlineData(AdjustmentReason.Damage, "Adjustment reason Damage is not allowed for movement type AdjustmentIncrease.")]
+    [InlineData(AdjustmentReason.Loss, "Adjustment reason Loss is not allowed for movement type AdjustmentIncrease.")]
+    [InlineData(AdjustmentReason.Disposal, "Adjustment reason Disposal is not allowed for movement type AdjustmentIncrease.")]
+    public void CreateAdjustment_InvalidReasonForMovementType_ThrowsBusinessRuleException(AdjustmentReason reason, string expectedMessage)
+    {
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateAdjustment(type: MovementType.AdjustmentIncrease, reason: reason));
+
+        // Assert
+        Assert.Equal(expectedMessage, exception.Message);
+    }
+
+    [Fact]
+    public void CreateAdjustment_DecreaseWithAllowedReason_ReturnsAdjustment()
+    {
+        // Arrange
+        var type = MovementType.AdjustmentDecrease;
+        var reason = AdjustmentReason.Damage;
+
+        // Act
+        var stockMovement = CreateAdjustment(type: type, reason: reason);
+
+        // Assert
+        Assert.Equal(type, stockMovement.Type);
+        Assert.Equal(reason, stockMovement.AdjustmentReason);
+    }
 }
