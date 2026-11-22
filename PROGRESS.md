@@ -32,6 +32,7 @@
 - [x] 2.5c-3a StockMovement.CreateIssue + test helper CreateIssue + tests (BR-02, BR-28, BR-38, BR-44)
 - [x] 2.5c-3b Refactoring κοινών ελέγχων StockMovement + MovementType.IsAllowedFor (BR-44) + test σειράς ελέγχων στη CreateIssue
 - [x] 2.5d-1 StockMovement.CreateAdjustment + test helper CreateAdjustment + tests (guards, τύπος, αιτιολογία, κατάσταση, κοινοί έλεγχοι, σειρά ελέγχων) (BR-15, BR-28, BR-41, BR-44)
+- [x] 2.5d-2a StockMovement.CreateTransfer + TransferId + test helper CreateTransfer + test ValidInput (BR-40, BR-44)
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -112,7 +113,9 @@
 | Λάθος τύπος στα tests της `CreateAdjustment` | Ρητά `InlineData` και όχι `Enum.GetValues` | Ο έλεγχος στη factory είναι whitelist, οπότε κάθε νέος τύπος απορρίπτεται by default. Το `Enum.GetValues` χρειάζεται μόνο όπου υπάρχει κανόνας ανά τιμή (switch) |
 | Τιμές στον helper των tests | Ό,τι εμφανίζεται στο Assert (π.χ. ο τύπος στο μήνυμα) περνιέται ρητά στον helper, ακόμα κι αν ισούται με το default | Το test δεν σπάει αν αλλάξει το default και διαβάζεται χωρίς να ανοίξεις τον helper |
 | Test σειράς ελέγχων στη `CreateAdjustment` | Inactive item + αιτιολογία που δεν επιτρέπεται | Η αιτιολογία είναι ο μόνος έλεγχος που υπάρχει μόνο στο Adjustment· το test αποδεικνύει ότι μπήκε μετά τον έλεγχο κατάστασης |
+| Μεταφορά (BR-40) | Μία factory `CreateTransfer(item, source, destination, ...)` που επιστρέφει named tuple `(Out, In)`, με κοινό `TransferId` που φτιάχνεται μέσα στη factory | Οι δύο κινήσεις δημιουργούνται πάντα μαζί, αφού ο constructor είναι private. Το named tuple δείχνει ποια είναι ποια χωρίς νέο τύπο. Aggregate `Transfer` μόνο αν η μεταφορά αποκτήσει δική της κατάσταση (π.χ. διαμετακόμιση) |
+| Έλεγχοι εκτός factory μεταφοράς | Ένα υλικό ανά θέση (BR-35) και αρνητικό απόθεμα στην προέλευση (BR-01) ελέγχονται στο Application | Χρειάζονται γνώση του αποθέματος, που η κίνηση δεν έχει |
 
 ## Επόμενο βήμα
-Task 2.5d-2: Transfer (Out/In με κοινό TransferId, BR-40).
+Task 2.5d-2b: Tests αποτυχίας CreateTransfer (guards, ίδια θέση, κατάσταση υλικού/θέσεων, ποσότητα, ημερομηνία, σειρά ελέγχων).
 Μετά: 2.5e Reversal, 2.5f PR.
