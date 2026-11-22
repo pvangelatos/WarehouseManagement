@@ -726,4 +726,89 @@ public class StockMovementTests
         Assert.Equal(type, stockMovement.Type);
         Assert.Equal(reason, stockMovement.AdjustmentReason);
     }
+
+    [Theory]
+    [InlineData(MovementType.AdjustmentDecrease)]
+    [InlineData(MovementType.AdjustmentIncrease)]
+    public void CreateAdjustment_DiscontinuedItem_ReturnsAdjustment(MovementType type)
+    {
+        // Arrange
+        var item = CreateItem();
+        item.Discontinue();
+
+        // Act
+        StockMovement stockMovement = CreateAdjustment(type: type, item: item);
+
+        // Assert
+        Assert.Equal(type, stockMovement.Type);
+        Assert.Equal(item.Id, stockMovement.ItemId);
+    }
+
+    [Fact]
+    public void CreateAdjustment_InactiveItem_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        var item = CreateItem();
+        item.Discontinue();
+        item.Deactivate(Quantity.Zero);
+
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateAdjustment(item: item, type: MovementType.AdjustmentIncrease));
+
+        // Assert
+        Assert.Equal("Movement type AdjustmentIncrease is not allowed for item VALID-SKU with status Inactive.", exception.Message);
+    }
+
+    [Fact]
+    public void CreateAdjustment_InactiveLocation_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        var location = CreateLocation();
+        location.Deactivate(isEmpty: true);
+
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateAdjustment(location: location));
+
+        // Assert
+        Assert.Equal("Location 001-01-00 with status Inactive does not allow stock movements.", exception.Message);
+    }
+
+    [Fact]
+    public void CreateAdjustment_ZeroQuantity_ThrowsBusinessRuleException()
+    {
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateAdjustment(quantity: 0));
+
+        // Assert
+        Assert.Equal("Quantity must be greater than zero.", exception.Message);
+    }
+
+    [Fact]
+    public void CreateAdjustment_DecimalQuantityForWholeUnit_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        decimal quantity = 1.5m;
+
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateAdjustment(quantity: quantity));
+
+        // Assert
+        Assert.Equal("Quantity for Box cannot have more than 0 decimal places.", exception.Message);
+    }
+
+    [Fact]
+    public void CreateAdjustment_DocumentDateAfterRecordingDate_ThrowsBusinessRuleException()
+    {
+        // Arrange
+        var documentDate = new DateOnly(2026, 11, 11);
+        var recordedAt = new DateTimeOffset(2026, 11, 10, 12, 0, 0, TimeSpan.FromHours(2));
+
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateAdjustment(
+            documentDate: documentDate,
+            recordedAt: recordedAt));
+
+        // Assert
+        Assert.Equal("Document date 2026-11-11 cannot be after recording date 2026-11-10.", exception.Message);
+    }
 }
