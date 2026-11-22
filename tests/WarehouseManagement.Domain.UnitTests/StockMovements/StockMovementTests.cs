@@ -61,6 +61,26 @@ public class StockMovementTests
             recordedAt ?? DefaultRecordedAt,
             recordedBy ?? "test user");
 
+    private static (StockMovement Out, StockMovement In) CreateTransfer(
+        Item? item = null,
+        Location? source = null,
+        Location? destination = null,
+        decimal quantity = 5,
+        DateOnly? documentDate = null,
+        DateTimeOffset? recordedAt = null,
+        string? recordedBy = null) =>
+        StockMovement.CreateTransfer(
+            item ?? CreateItem(),
+            source ?? CreateLocation(),
+            destination ?? CreateLocation(LocationCode.Create(
+                                LocationCode.MinAisle + 1,
+                                LocationCode.MinBay,
+                                LocationCode.MinLevel)),
+            quantity,
+            documentDate ?? DefaultDocumentDate,
+            recordedAt ?? DefaultRecordedAt,
+            recordedBy ?? "test user");
+
     private static Item CreateItem(
        string sku = "VALID-SKU",
        string name = "Valid Item Name",
@@ -107,6 +127,7 @@ public class StockMovementTests
         Assert.Equal(recordedAt, stockMovement.RecordedAt);
         Assert.Equal(recordedBy, stockMovement.RecordedBy);
         Assert.Equal(supplierDocument, stockMovement.SupplierDocument);
+        Assert.Null(stockMovement.TransferId);
     }
 
     [Fact]
@@ -419,6 +440,7 @@ public class StockMovementTests
         Assert.Equal(recordedAt, stockMovement.RecordedAt);
         Assert.Equal(recordedBy, stockMovement.RecordedBy);
         Assert.Null(stockMovement.SupplierDocument);
+        Assert.Null(stockMovement.TransferId);
     }
 
     [Fact]
@@ -598,6 +620,7 @@ public class StockMovementTests
         Assert.Equal(recordedAt, stockMovement.RecordedAt);
         Assert.Equal(recordedBy, stockMovement.RecordedBy);
         Assert.Null(stockMovement.SupplierDocument);
+        Assert.Null(stockMovement.TransferId);
     }
 
     [Fact]
@@ -825,5 +848,58 @@ public class StockMovementTests
 
         // Assert
         Assert.Equal("Movement type AdjustmentIncrease is not allowed for item VALID-SKU with status Inactive.", exception.Message);
+    }
+
+    [Fact]
+    public void CreateTransfer_ValidInput_ReturnsOutAndInWithAllData()
+    {
+        // Arrange
+        var item = CreateItem();
+        var source = CreateLocation();
+        var destination = CreateLocation(LocationCode.Create(
+                                LocationCode.MinAisle + 1,
+                                LocationCode.MinBay,
+                                LocationCode.MinLevel));
+        decimal quantity = 5;
+        var documentDate = DefaultDocumentDate;
+        var recordedAt = DefaultRecordedAt;
+        string recordedBy = "test_user";
+
+        // Act
+        var (transferOut, transferIn) = StockMovement.CreateTransfer(
+            item,
+            source,
+            destination,
+            quantity,
+            documentDate,
+            recordedAt,
+            recordedBy);
+
+        // Assert
+        Assert.NotEqual(Guid.Empty, transferOut.Id);
+        Assert.Equal(MovementType.TransferOut, transferOut.Type);
+        Assert.Equal(source.Id, transferOut.LocationId);
+        Assert.Equal(item.Id, transferOut.ItemId);
+        Assert.Equal(quantity, transferOut.Quantity.Value);
+        Assert.Equal(documentDate, transferOut.DocumentDate);
+        Assert.Equal(recordedAt, transferOut.RecordedAt);
+        Assert.Equal(recordedBy, transferOut.RecordedBy);
+        Assert.Null(transferOut.AdjustmentReason);
+        Assert.Null(transferOut.SupplierDocument);
+
+        Assert.NotEqual(Guid.Empty, transferIn.Id);
+        Assert.Equal(MovementType.TransferIn, transferIn.Type);
+        Assert.Equal(destination.Id, transferIn.LocationId);
+        Assert.Equal(item.Id, transferIn.ItemId);
+        Assert.Equal(quantity, transferIn.Quantity.Value);
+        Assert.Equal(documentDate, transferIn.DocumentDate);
+        Assert.Equal(recordedAt, transferIn.RecordedAt);
+        Assert.Equal(recordedBy, transferIn.RecordedBy);
+        Assert.Null(transferIn.AdjustmentReason);
+        Assert.Null(transferIn.SupplierDocument);
+
+        Assert.NotNull(transferOut.TransferId);
+        Assert.Equal(transferOut.TransferId, transferIn.TransferId);
+        Assert.NotEqual(transferOut.Id, transferIn.Id);
     }
 }

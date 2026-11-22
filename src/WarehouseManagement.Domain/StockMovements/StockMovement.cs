@@ -17,6 +17,8 @@ public sealed class StockMovement
     public SupplierDocument? SupplierDocument { get; }
     public AdjustmentReason? AdjustmentReason { get; }
 
+    public Guid? TransferId { get; private set; }
+
     private StockMovement(
         Guid id,
         Guid itemId,
@@ -27,7 +29,8 @@ public sealed class StockMovement
         DateTimeOffset recordedAt,
         string recordedBy,
         SupplierDocument? supplierDocument,
-        AdjustmentReason? adjustmentReason)
+        AdjustmentReason? adjustmentReason,
+        Guid? transferId)
     {
         Id = id;
         ItemId = itemId;
@@ -39,6 +42,7 @@ public sealed class StockMovement
         RecordedBy = recordedBy;
         SupplierDocument = supplierDocument;
         AdjustmentReason = adjustmentReason;
+        TransferId = transferId;
     }
 
     public static StockMovement CreateReceipt(
@@ -73,7 +77,8 @@ public sealed class StockMovement
             recordedAt,
             recordedBy,
             supplierDocument,
-            adjustmentReason: null);
+            adjustmentReason: null,
+            transferId: null);
     }
 
     public static StockMovement CreateIssue(
@@ -106,7 +111,8 @@ public sealed class StockMovement
             recordedAt,
             recordedBy,
             supplierDocument: null,
-            adjustmentReason: null);
+            adjustmentReason: null,
+            transferId: null);
     }
 
     public static StockMovement CreateAdjustment(
@@ -146,7 +152,64 @@ public sealed class StockMovement
             recordedAt,
             recordedBy,
             supplierDocument: null,
-            adjustmentReason: adjustmentReason);
+            adjustmentReason: adjustmentReason,
+            transferId: null);
+    }
+
+    public static (StockMovement Out, StockMovement In) CreateTransfer(
+        Item item,
+        Location source,
+        Location destination,
+        decimal quantity,
+        DateOnly documentDate,
+        DateTimeOffset recordedAt,
+        string recordedBy)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(destination);
+        ArgumentException.ThrowIfNullOrWhiteSpace(recordedBy);
+
+        ValidateItemStatus(item, MovementType.TransferOut);
+        ValidateLocationStatus(source);
+        ValidateLocationStatus(destination);
+
+        if (source.Id == destination.Id)
+            throw new BusinessRuleException("Source and destination locations must be different for a transfer.");
+
+        Quantity quantityValue = CreatePositiveQuantity(quantity, item.UnitOfMeasure);
+
+        ValidateDocumentDate(documentDate, recordedAt);
+
+        Guid transferId = Guid.CreateVersion7();
+
+        StockMovement transferOut = new StockMovement(
+            Guid.CreateVersion7(),
+            item.Id,
+            source.Id,
+            MovementType.TransferOut,
+            quantityValue,
+            documentDate,
+            recordedAt,
+            recordedBy,
+            supplierDocument: null,
+            adjustmentReason: null,
+            transferId: transferId);
+
+        StockMovement transferIn = new StockMovement(
+            Guid.CreateVersion7(),
+            item.Id,
+            destination.Id,
+            MovementType.TransferIn,
+            quantityValue,
+            documentDate,
+            recordedAt,
+            recordedBy,
+            supplierDocument: null,
+            adjustmentReason: null,
+            transferId: transferId);
+
+        return (transferOut, transferIn);
     }
 
     private static void ValidateItemStatus(Item item, MovementType movementType)
