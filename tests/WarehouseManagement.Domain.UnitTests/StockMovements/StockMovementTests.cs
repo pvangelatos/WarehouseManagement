@@ -599,4 +599,90 @@ public class StockMovementTests
         Assert.Equal(recordedBy, stockMovement.RecordedBy);
         Assert.Null(stockMovement.SupplierDocument);
     }
+
+    [Fact]
+    public void CreateAdjustment_NullItem_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var location = CreateLocation();
+        var type = MovementType.AdjustmentIncrease;
+        var reason = AdjustmentReason.CountingError;
+        decimal quantity = 5;
+        var documentDate = DefaultDocumentDate;
+        var recordedAt = DefaultRecordedAt;
+        string recordedBy = "test_user";
+
+        // Act
+        var exception = Assert.Throws<ArgumentNullException>(() => StockMovement.CreateAdjustment(
+            null!,
+            location,
+            type,
+            reason,
+            quantity,
+            documentDate,
+            recordedAt,
+            recordedBy));
+
+        // Assert
+        Assert.Equal("item", exception.ParamName);
+    }
+
+    [Fact]
+    public void CreateAdjustment_NullLocation_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var item = CreateItem();
+        var type = MovementType.AdjustmentIncrease;
+        var reason = AdjustmentReason.CountingError;
+        decimal quantity = 5;
+        var documentDate = DefaultDocumentDate;
+        var recordedAt = DefaultRecordedAt;
+        string recordedBy = "test_user";
+
+        // Act
+        var exception = Assert.Throws<ArgumentNullException>(() => StockMovement.CreateAdjustment(
+            item,
+            null!,
+            type,
+            reason,
+            quantity,
+            documentDate,
+            recordedAt,
+            recordedBy));
+
+        // Assert
+        Assert.Equal("location", exception.ParamName);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void CreateAdjustment_MissingRecordedBy_ThrowsArgumentException(string? recordedBy)
+    {
+        // Arrange
+        var item = CreateItem();
+        var location = CreateLocation();
+        var type = MovementType.AdjustmentIncrease;
+        var reason = AdjustmentReason.CountingError;
+        decimal quantity = 5;
+        var documentDate = DefaultDocumentDate;
+        var recordedAt = DefaultRecordedAt;
+
+        // Act
+        var exception = Assert.ThrowsAny<ArgumentException>(() => StockMovement.CreateAdjustment(
+            item,
+            location,
+            type,
+            reason,
+            quantity,
+            documentDate,
+            recordedAt,
+            recordedBy!));
+
+        // Assert
+        Assert.Equal("recordedBy", exception.ParamName);
+    }
+
+
 }
