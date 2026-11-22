@@ -17,7 +17,7 @@ public sealed class StockMovement
     public SupplierDocument? SupplierDocument { get; }
     public AdjustmentReason? AdjustmentReason { get; }
 
-    public Guid? TransferId { get; private set; }
+    public Guid? TransferId { get; }
 
     private StockMovement(
         Guid id,
