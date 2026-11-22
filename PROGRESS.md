@@ -31,6 +31,7 @@
 - [x] 2.5c-2 Entity StockMovement + CreateReceipt (guards, BR-02, BR-38, BR-39, BR-44) + tests
 - [x] 2.5c-3a StockMovement.CreateIssue + test helper CreateIssue + tests (BR-02, BR-28, BR-38, BR-44)
 - [x] 2.5c-3b Refactoring κοινών ελέγχων StockMovement + MovementType.IsAllowedFor (BR-44) + test σειράς ελέγχων στη CreateIssue
+- [x] 2.5d-1 StockMovement.CreateAdjustment + test helper CreateAdjustment + tests (guards, τύπος, αιτιολογία, κατάσταση, κοινοί έλεγχοι, σειρά ελέγχων) (BR-15, BR-28, BR-41, BR-44)
 
 ## Αποφάσεις
 | Θέμα | Απόφαση | Αιτιολόγηση |
@@ -108,7 +109,10 @@
 | Expected σε tests μηνυμάτων | Σταθερό κείμενο, όχι interpolation | Με interpolation το test επαναλαμβάνει τον κώδικα και δεν πιάνει λάθη (π.χ. χαμένο `ToString`) |
 | Test σειράς ελέγχων | Ένα ανά factory | Η σειρά των κλήσεων είναι γραμμένη σε κάθε factory χωριστά |
 | Refactoring με αλλαγή μηνυμάτων | Χωριστό commit για τη δομή (tests ανέγγιχτα) και για την αλλαγή μηνυμάτων | Ο reviewer ξεχωρίζει αμέσως τι είναι δομή και τι συμπεριφορά |
+| Λάθος τύπος στα tests της `CreateAdjustment` | Ρητά `InlineData` και όχι `Enum.GetValues` | Ο έλεγχος στη factory είναι whitelist, οπότε κάθε νέος τύπος απορρίπτεται by default. Το `Enum.GetValues` χρειάζεται μόνο όπου υπάρχει κανόνας ανά τιμή (switch) |
+| Τιμές στον helper των tests | Ό,τι εμφανίζεται στο Assert (π.χ. ο τύπος στο μήνυμα) περνιέται ρητά στον helper, ακόμα κι αν ισούται με το default | Το test δεν σπάει αν αλλάξει το default και διαβάζεται χωρίς να ανοίξεις τον helper |
+| Test σειράς ελέγχων στη `CreateAdjustment` | Inactive item + αιτιολογία που δεν επιτρέπεται | Η αιτιολογία είναι ο μόνος έλεγχος που υπάρχει μόνο στο Adjustment· το test αποδεικνύει ότι μπήκε μετά τον έλεγχο κατάστασης |
 
 ## Επόμενο βήμα
-Task 2.5d: Adjustment (Increase/Decrease με αιτιολογία, BR-15, BR-41) + Transfer (Out/In με κοινό αναγνωριστικό, BR-40).
+Task 2.5d-2: Transfer (Out/In με κοινό TransferId, BR-40).
 Μετά: 2.5e Reversal, 2.5f PR.
