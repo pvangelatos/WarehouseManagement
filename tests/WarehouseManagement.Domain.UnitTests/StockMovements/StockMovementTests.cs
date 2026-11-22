@@ -811,4 +811,19 @@ public class StockMovementTests
         // Assert
         Assert.Equal("Document date 2026-11-11 cannot be after recording date 2026-11-10.", exception.Message);
     }
+
+    [Fact]
+    public void CreateAdjustment_InactiveItemAndInvalidReason_ThrowsItemStatusErrorFirst()
+    {
+        // Arrange
+        var item = CreateItem();
+        item.Discontinue();
+        item.Deactivate(Quantity.Zero);
+
+        // Act
+        var exception = Assert.Throws<BusinessRuleException>(() => CreateAdjustment(item: item, type: MovementType.AdjustmentIncrease, reason: AdjustmentReason.Damage));
+
+        // Assert
+        Assert.Equal("Movement type AdjustmentIncrease is not allowed for item VALID-SKU with status Inactive.", exception.Message);
+    }
 }
